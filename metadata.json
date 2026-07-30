@@ -1,0 +1,6 @@
+{
+  "name": "पँवारी Pawari (Bhoyari) शब्दकोश",
+  "description": "Professional Pawari (Bhoyari) Digital Dictionary with 2,740+ vocabulary entries, Unicode IPA, bilingual definitions, audio pronunciation, password-protected word entry, and feedback support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
