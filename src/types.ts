@@ -53,16 +53,6 @@ export interface NewsItem {
   isImportant?: boolean;
 }
 
-export interface CoAdminInvite {
-  id: string;
-  email: string;
-  name?: string;
-  role: 'co-admin' | 'editor';
-  status: 'pending' | 'accepted' | 'revoked';
-  invitedAt: string;
-  inviteCode: string;
-}
-
 export interface SiteSettings {
   siteTitle: string;
   siteSubtitle: string;
@@ -77,11 +67,4 @@ export interface SiteSettings {
   showPaheliyanTab: boolean;
   showQuizTab: boolean;
   adminPin: string;
-  adminEmails: string[];
-  primaryEmail: string;
-  themeColor: 'amber' | 'emerald' | 'maroon' | 'indigo';
-  headerBgStyle: 'stone' | 'amber' | 'maroon';
-  footerContactPhone: string;
-  footerContactEmail: string;
-  footerAddress: string;
 }
