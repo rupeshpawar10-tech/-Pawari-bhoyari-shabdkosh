@@ -4,20 +4,81 @@ import {
   Volume2, VolumeX, Copy, Check, Filter, X, ChevronRight, ChevronLeft, Info, ShieldCheck, 
   Grid, List, Trash2, Edit3, Send, Heart, Sparkles, RefreshCw, HelpCircle, AlertCircle, FileText,
   Eye, EyeOff, User, Code, Award, RotateCcw, CheckCircle2, Layers, Download, Users, BarChart2,
-  Newspaper, Settings, Key, Bell, BellRing, Sliders, Save, CheckCircle
+  Newspaper, Settings, Key, Bell, BellRing, Sliders, Save, CheckCircle, UserPlus, Clock, Calendar
 } from 'lucide-react';
 import dictionaryData from './data/pawari_dictionary.json';
 import paheliyanData from './data/pawari_paheliyan.json';
 import { PawariQuizSection, QuizRecord } from './components/PawariQuizSection';
 import { NewsSection } from './components/NewsSection';
-import { Entry, MembershipRecord, SuggestionRecord, PendingWordRecord, NewsItem, SiteSettings } from './types';
+import { PatrikaSection } from './components/PatrikaSection';
+import { Entry, MembershipRecord, SuggestionRecord, PendingWordRecord, NewsItem, SiteSettings, PaheliItem, PatrikaArticle, SansthanOfficial } from './types';
 
-export type { Entry, MembershipRecord, SuggestionRecord, PendingWordRecord, NewsItem, SiteSettings };
+export type { Entry, MembershipRecord, SuggestionRecord, PendingWordRecord, NewsItem, SiteSettings, PaheliItem, PatrikaArticle, SansthanOfficial };
 
 const alphabets = [
   "सब", "अ", "आ", "इ", "ई", "उ", "ऊ", "ए", "ऐ", "ओ", "औ", 
   "क", "ख", "ग", "घ", "च", "छ", "ज", "झ", "ट", "ठ", "ड", "ढ", 
   "त", "थ", "द", "ध", "न", "प", "फ", "ब", "भ", "म", "य", "र", "ल", "व", "श", "ष", "स", "ह"
+];
+
+const DEFAULT_SANSTHAN_OFFICIALS: SansthanOfficial[] = [
+  {
+    id: 'off_1',
+    name: 'वल्लभ डोंगरे',
+    designation: 'संरक्षक व संस्थापक अध्यक्ष',
+    timePeriod: '2018 - वर्तमान',
+    phone: '+91-9425000000',
+    email: 'vallabh.dongre@gmail.com',
+    location: 'मुलताई (ज़िला बैतूल)',
+    bio: 'सतपुड़ा संस्कृति संस्थान एवं माँ ताप्ती शोध संस्थान मुलताई के संस्थापक व पँवारी बोली के वरिष्ठ साहित्यकार व शोधकर्ता।'
+  },
+  {
+    id: 'off_2',
+    name: 'रूपेश पवार',
+    designation: 'प्रधान संपादक व सचिव',
+    timePeriod: '2020 - वर्तमान',
+    phone: '+91-9425888888',
+    email: 'rupeshpawar10@gmail.com',
+    location: 'मुलताई (बैतूल)',
+    bio: 'पँवारी शोध पत्रिका के प्रधान संपादक, डिजिटल कोश व भाषा प्रलेखीकरण अभियान के मुख्य संयोजक।'
+  },
+  {
+    id: 'off_3',
+    name: 'डॉ. रामेश्वर पवार',
+    designation: 'उपाध्यक्ष व मुख्य सलाहकार',
+    timePeriod: '2021 - वर्तमान',
+    phone: '+91-9826000000',
+    email: 'rameshwar.pawar@gmail.com',
+    location: 'बैतूल (म.प्र.)',
+    bio: 'लोक-साहित्य एवं भाषा विज्ञान के वरिष्ठ विद्वान परामर्शदाता।'
+  },
+  {
+    id: 'off_4',
+    name: 'प्रो. हरिशंकर ठाकरे',
+    designation: 'संपादकीय मंडल सदस्य व शोध निदेशक',
+    timePeriod: '2022 - वर्तमान',
+    phone: '+91-9400011122',
+    location: 'छिंदवाड़ा (म.प्र.)',
+    bio: 'पँवारी (भोयरी) लोक-गीत एवं व्याकरण प्रलेखीकरण विशेषज्ञ।'
+  },
+  {
+    id: 'off_5',
+    name: 'इंजी. अमर पवार',
+    designation: 'सह-संपादक व तकनीकी प्रमुख',
+    timePeriod: '2023 - वर्तमान',
+    phone: '+91-9898989898',
+    location: 'नागपुर (महाराष्ट्र)',
+    bio: 'डिजिटल शब्दकोश तकनीकी विकास व युवा शोध संवाद संयोजक।'
+  },
+  {
+    id: 'off_6',
+    name: 'राजेश बारंगे पंवार',
+    designation: 'कार्यकारिणी सदस्य व प्रचार प्रमुख',
+    timePeriod: '2022 - वर्तमान',
+    phone: '+91-9123456789',
+    location: 'मुलताई (बैतूल)',
+    bio: 'पँवारी लोक-संस्कृति प्रलेखीकरण व वार्षिक शोध महोत्सव संयोजक।'
+  }
 ];
 
 const DEFAULT_SITE_SETTINGS: SiteSettings = {
@@ -33,8 +94,82 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
   showShodhSansthanCard: true,
   showPaheliyanTab: true,
   showQuizTab: true,
+  showQuickStats: true,
+  showAlphabetGrid: true,
+  showMembershipCard: true,
+  showSuggestWordButton: true,
+  showPatrikaSection: true,
+  themeColor: 'amber',
+  fontStyle: 'serif',
+  shodhSansthanTitle: "माँ ताप्ती शोध संस्थान (मुलताई, बैतूल)",
+  shodhSansthanEditor: "राजेश बारंगे पंवार",
+  shodhSansthanOrg: "सतपुड़ा संस्कृति संस्थान एवं माँ ताप्ती शोध संस्थान",
+  shodhSansthanAddress: "मुलताई, ज़िला बैतूल (मध्य प्रदेश)",
+  shodhSansthanPhone: "+91-9425000000",
+  shodhSansthanEmail: "rupeshpawar10@gmail.com",
+  shodhSansthanDescription: "सतपुड़ा अंचल की पँवारी (भोयरी) बोली, लोक-संस्कृति, मुहावरे, कहावतें एवं प्राचीन परंपराओं के संरक्षण व शोध हेतु समर्पित संस्थान।",
+  patrikaTitle: "पँवारी शोध पत्रिका (Pawari Research Journal)",
+  patrikaVolume: "वर्ष 12, अंक 4 (सतपुड़ा संस्कृति व भाषा विशेषांक)",
+  patrikaChiefEditor: "वल्लभ डोंगरे & रूपेश पवार",
+  patrikaEditorialBoard: "डॉ. रामेश्वर पवार, प्रो. हरिशंकर ठाकरे, इंजी. अमर पवार, राजेश बारंगे पंवार",
+  patrikaRegistration: "पंजीयन क्र. MP/PAWARI/PATRIKA/2026/12",
+  patrikaCoverUrl: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
+  patrikaPdfUrl: "https://example.com/pawari-patrika-vol12.pdf",
+  patrikaDescription: "पँवारी शोध पत्रिका सतपुड़ा संस्कृति संस्थान (भोपाल) एवं माँ ताप्ती शोध संस्थान (मुलताई) की संयुक्त त्रैमासिक शोध पत्रिका है। इसमें पँवारी बोली का इतिहास, लोक-साहित्य, लोकगीत, कहावतें, शब्द-व्युत्पत्ति तथा क्षेत्रीय संस्कृति पर गहन शोध आलेख प्रकाशित किए जाते हैं।",
+  patrikaSubmissionGuidelines: "1. शोध आलेख/रचनाएँ पँवारी बोली, लोक-साहित्य, लोक-संगीत, मुहावरे या सतपुड़ा के इतिहास से संबंधित होनी चाहिए।\n2. आलेख देवनागरी लिपि में 500 से 2500 शब्दों में भेजें।\n3. मौलिकता का घोषणा-पत्र साथ में संलग्न करना अनिवार्य है।\n4. स्वीकृत आलेखों को आगामी शोध अंक में स्थान दिया जाएगा।",
+  patrikaContactEmail: "rupeshpawar10@gmail.com",
+  patrikaContactPhone: "+91-9425000000",
+  footerText: "सतपुड़ा अंचल (बैतूल, छिंदवाड़ा, नागपुर, वर्धा) की प्राचीन पँवारी (भोयरी) बोली का प्रथम प्रामाणिक डिजिटल कोश एवं शोध मंच।",
+  footerCopyright: "© 2026 सतपुड़ा संस्कृति संस्थान एवं माँ ताप्ती शोध संस्थान मुलताई | सर्वाधिकार सुरक्षित",
   adminPin: "7777"
 };
+
+const DEFAULT_PATRIKA_ARTICLES: PatrikaArticle[] = [
+  {
+    id: 'ART-101',
+    title: 'पँवारी (भोयरी) बोली की उत्पत्ति एवं सतपुड़ा अंचल की भाषिक धरोहर',
+    author: 'वल्लभ डोंगरे (संस्थापक, सतपुड़ा संस्कृति संस्थान)',
+    category: 'भाषा व व्याकरण शोध',
+    summary: 'छिंदवाड़ा, बालाघाट, सिवनी एवं बैतूल जिलों में बोली जाने वाली पँवारी बोली के व्याकरणिक ढाँचे तथा राजस्थानी-मालवी-मराठी के ऐतिहासिक संगम पर विस्तृत विश्लेषणात्मक अध्ययन।',
+    date: 'जनवरी 2026',
+    readTime: '8 मिनट',
+    pdfUrl: 'https://pawari-research.org/pdf/pawari_language_origin_2026.pdf',
+    articleUrl: 'https://pawari-research.org/article/pawari_language_origin'
+  },
+  {
+    id: 'ART-102',
+    title: 'माँ ताप्ती तट मुलताई का ऐतिहासिक एवं सांस्कृतिक महत्व',
+    author: 'रूपेश पवार (संपादक, माँ ताप्ती शोध संस्थान)',
+    category: 'इतिहास एवं लोक-संस्कृति',
+    summary: 'मुलताई (मूलतापी) क्षेत्र की पौराणिक कथाओं, सूर्यपुत्री माँ ताप्ती के पावन तट पर प्रचलित पँवारी लोकगीतों एवं कहावतों का प्रामाणिक संकलन व विवेचन।',
+    date: 'दिसंबर 2025',
+    readTime: '6 मिनट',
+    pdfUrl: 'https://pawari-research.org/pdf/tapti_multai_history_2025.pdf',
+    articleUrl: 'https://pawari-research.org/article/tapti_multai_history'
+  },
+  {
+    id: 'ART-103',
+    title: 'पँवारी कहावतें (अखाणे) एवं पहेलियाँ (फलौदी): समाजशास्त्र',
+    author: 'डॉ. रामेश्वर पवार',
+    category: 'लोक-साहित्य',
+    summary: 'सतपुड़ा अंचल की कृषि परंपराओं, मौसम पूर्वानुमान एवं पारिवारिक जीवन से जुड़ी प्रामाणिक पँवारी पहेलियों (फलौदी) एवं अखाणों का सामाजिक विश्लेषण।',
+    date: 'नवंबर 2025',
+    readTime: '10 मिनट',
+    pdfUrl: 'https://pawari-research.org/pdf/pawari_proverbs_2025.pdf',
+    articleUrl: 'https://pawari-research.org/article/pawari_proverbs'
+  },
+  {
+    id: 'ART-104',
+    title: 'पँवारी लोकगीत: कृषि संस्कृति एवं फाग गायन परंपरा',
+    author: 'प्रो. हरिशंकर ठाकरे',
+    category: 'लोक-संगीत',
+    summary: 'बैतूल-छिंदवाड़ा क्षेत्र में बुआई, कटाई एवं होली पर्व पर गाए जाने वाले पारंपरिक पँवारी फाग तथा लावणी लोकगीतों का स्वरलिपि सहित प्रलेखीकरण।',
+    date: 'अक्टूबर 2025',
+    readTime: '7 मिनट',
+    pdfUrl: 'https://pawari-research.org/pdf/pawari_folksongs_2025.pdf',
+    articleUrl: 'https://pawari-research.org/article/pawari_folksongs'
+  }
+];
 
 const DEFAULT_NEWS_ITEMS: NewsItem[] = [
   {
@@ -67,8 +202,8 @@ const DEFAULT_NEWS_ITEMS: NewsItem[] = [
 ];
 
 export default function App() {
-  // Navigation Active Tab State: 'dictionary' | 'paheliyan' | 'quiz' | 'news'
-  const [activeTab, setActiveTab] = useState<'dictionary' | 'paheliyan' | 'quiz' | 'news'>('dictionary');
+  // Navigation Active Tab State: 'dictionary' | 'paheliyan' | 'quiz' | 'news' | 'patrika'
+  const [activeTab, setActiveTab] = useState<'dictionary' | 'paheliyan' | 'quiz' | 'news' | 'patrika'>('dictionary');
   const [selectedQuizType, setSelectedQuizType] = useState<'paheliyan' | 'words'>('paheliyan');
 
   // Site Customization Settings State
@@ -80,6 +215,20 @@ export default function App() {
       return DEFAULT_SITE_SETTINGS;
     }
   });
+
+  // Patrika Articles State
+  const [patrikaArticles, setPatrikaArticles] = useState<PatrikaArticle[]>(() => {
+    try {
+      const saved = localStorage.getItem('pawari_patrika_articles');
+      return saved ? JSON.parse(saved) : DEFAULT_PATRIKA_ARTICLES;
+    } catch {
+      return DEFAULT_PATRIKA_ARTICLES;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pawari_patrika_articles', JSON.stringify(patrikaArticles));
+  }, [patrikaArticles]);
 
   // News & Announcements State
   const [newsItems, setNewsItems] = useState<NewsItem[]>(() => {
@@ -152,12 +301,30 @@ export default function App() {
   const [showMembershipModal, setShowMembershipModal] = useState(false);
   const [membershipForm, setMembershipForm] = useState({
     name: '',
+    fatherName: '',
     phone: '',
+    email: '',
     district: '',
-    knowsPawari: 'हाँ, धाराप्रवाह जानते हैं',
+    village: '',
+    knowsPawari: 'हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं',
+    membershipType: 'आजीवन सदस्य (Life Member)',
     otherDetails: ''
   });
   const [membershipSuccess, setMembershipSuccess] = useState(false);
+
+  // Admin New Member State
+  const [adminMemberSuccess, setAdminMemberSuccess] = useState(false);
+  const [adminNewMemberForm, setAdminNewMemberForm] = useState({
+    name: '',
+    fatherName: '',
+    phone: '',
+    email: '',
+    district: '',
+    village: '',
+    knowsPawari: 'हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं',
+    membershipType: 'आजीवन सदस्य (Life Member)',
+    otherDetails: ''
+  });
 
   const [showSuggestionBoxModal, setShowSuggestionBoxModal] = useState(false);
   const [suggestionBoxForm, setSuggestionBoxForm] = useState({
@@ -179,9 +346,23 @@ export default function App() {
   });
   const [suggestWordSuccess, setSuggestWordSuccess] = useState(false);
 
+  // Paheliyan (Riddles) List State (supports Admin CMS live add/edit/delete/reset)
+  const [paheliyanList, setPaheliyanList] = useState<PaheliItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('pawari_paheliyan_custom_list');
+      return saved ? JSON.parse(saved) : (paheliyanData as PaheliItem[]);
+    } catch {
+      return (paheliyanData as PaheliItem[]);
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pawari_paheliyan_custom_list', JSON.stringify(paheliyanList));
+  }, [paheliyanList]);
+
   // Admin Modal State & Records
   const [showAdminRecordsModal, setShowAdminRecordsModal] = useState(false);
-  const [adminTab, setAdminTab] = useState<'records' | 'memberships' | 'suggestions' | 'pendingWords' | 'news' | 'layoutSettings' | 'editDictionary' | 'security' | 'addWord'>('records');
+  const [adminTab, setAdminTab] = useState<'records' | 'memberships' | 'suggestions' | 'pendingWords' | 'news' | 'paheliyanCms' | 'shodhSansthanCms' | 'patrikaCms' | 'layoutSettings' | 'editDictionary' | 'security' | 'addWord'>('records');
   const [recordSearchTerm, setRecordSearchTerm] = useState('');
   
   const [adminQuizRecords, setAdminQuizRecords] = useState<QuizRecord[]>([]);
@@ -189,9 +370,103 @@ export default function App() {
   const [adminSuggestions, setAdminSuggestions] = useState<SuggestionRecord[]>([]);
   const [adminPendingWords, setAdminPendingWords] = useState<PendingWordRecord[]>([]);
 
+  // Patrika CMS State
+  const [patrikaCmsSuccess, setPatrikaCmsSuccess] = useState(false);
+  const [patrikaArticleSearchCmsTerm, setPatrikaArticleSearchCmsTerm] = useState('');
+  const [editingPatrikaArticle, setEditingPatrikaArticle] = useState<PatrikaArticle | null>(null);
+  const [newPatrikaArticleForm, setNewPatrikaArticleForm] = useState<{
+    title: string;
+    author: string;
+    category: string;
+    summary: string;
+    date: string;
+    readTime: string;
+    pdfUrl: string;
+    articleUrl: string;
+  }>({
+    title: '',
+    author: 'संपादकीय मंडल',
+    category: 'शोध आलेख',
+    summary: '',
+    date: 'अगस्त 2026',
+    readTime: '5 मिनट',
+    pdfUrl: '',
+    articleUrl: ''
+  });
+
+  // Paheliyan CMS State
+  const [paheliSearchCmsTerm, setPaheliSearchCmsTerm] = useState('');
+  const [editingPaheli, setEditingPaheli] = useState<PaheliItem | null>(null);
+  const [newPaheliForm, setNewPaheliForm] = useState<{
+    paheli: string;
+    answer: string;
+    hint: string;
+    category: string;
+  }>({
+    paheli: '',
+    answer: '',
+    hint: '',
+    category: 'फलौदी / छिन्न की कहानी (पहलोड़ी)'
+  });
+  const [paheliCmsSuccess, setPaheliCmsSuccess] = useState(false);
+
+  // Shodh Sansthan CMS State & Officials List
+  const [shodhSansthanSavedSuccess, setShodhSansthanSavedSuccess] = useState(false);
+  const [sansthanOfficials, setSansthanOfficials] = useState<SansthanOfficial[]>(() => {
+    try {
+      const saved = localStorage.getItem('pawari_sansthan_officials');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return DEFAULT_SANSTHAN_OFFICIALS;
+  });
+
+  const [editingSansthanOfficial, setEditingSansthanOfficial] = useState<SansthanOfficial | null>(null);
+  const [sansthanOfficialSearchTerm, setSansthanOfficialSearchTerm] = useState('');
+  const [newSansthanOfficialForm, setNewSansthanOfficialForm] = useState<{
+    name: string;
+    designation: string;
+    timePeriod: string;
+    phone: string;
+    email: string;
+    location: string;
+    bio: string;
+  }>({
+    name: '',
+    designation: 'संपादकीय मंडल सदस्य',
+    timePeriod: '2024 - वर्तमान',
+    phone: '',
+    email: '',
+    location: 'मुलताई (बैतूल)',
+    bio: ''
+  });
+
+  // Managed Time Periods State
+  const [managedTimePeriods, setManagedTimePeriods] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('pawari_managed_time_periods');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    const defaults = DEFAULT_SANSTHAN_OFFICIALS.map(o => o.timePeriod).filter(Boolean);
+    return Array.from(new Set(['2024 - वर्तमान', '2020 - 2024', '2018 - 2022', '2015 - 2018', ...defaults]));
+  });
+  const [newTimePeriodInput, setNewTimePeriodInput] = useState('');
+  const [editingTimePeriodObj, setEditingTimePeriodObj] = useState<{ oldName: string; newName: string } | null>(null);
+
   // States for Admin Word Editing & News Editing
   const [dictSearchTerm, setDictSearchTerm] = useState('');
   const [editingDictEntry, setEditingDictEntry] = useState<Entry | null>(null);
+  const [originalDictCleanWord, setOriginalDictCleanWord] = useState<string | null>(null);
+  const [editingNewsItem, setEditingNewsItem] = useState<NewsItem | null>(null);
   const [newNewsForm, setNewNewsForm] = useState<{
     title: string;
     category: NewsItem['category'];
@@ -293,12 +568,14 @@ export default function App() {
   // Combine static dictionary dataset with user's custom added entries & apply admin overrides
   const allEntries: Entry[] = useMemo(() => {
     const combined = [...customEntries, ...(dictionaryData as Entry[])];
-    return combined.map(entry => {
-      if (dictionaryOverrides[entry.clean_word]) {
-        return { ...entry, ...dictionaryOverrides[entry.clean_word] };
-      }
-      return entry;
-    });
+    return combined
+      .map(entry => {
+        if (dictionaryOverrides[entry.clean_word]) {
+          return { ...entry, ...dictionaryOverrides[entry.clean_word] };
+        }
+        return entry;
+      })
+      .filter(entry => !entry.isDeleted);
   }, [customEntries, dictionaryOverrides]);
 
   // Daily featured word of the day (deterministic based on date)
@@ -346,14 +623,15 @@ export default function App() {
 
   // Filtered Paheliyan List
   const filteredPaheliyan = useMemo(() => {
-    if (!paheliSearchTerm.trim()) return paheliyanData;
+    if (!paheliSearchTerm.trim()) return paheliyanList;
     const term = paheliSearchTerm.toLowerCase().trim();
-    return paheliyanData.filter(item => 
+    return paheliyanList.filter(item => 
       item.paheli.toLowerCase().includes(term) ||
       item.answer.toLowerCase().includes(term) ||
-      (item.hint && item.hint.toLowerCase().includes(term))
+      (item.hint && item.hint.toLowerCase().includes(term)) ||
+      (item.category && item.category.toLowerCase().includes(term))
     );
-  }, [paheliSearchTerm]);
+  }, [paheliSearchTerm, paheliyanList]);
 
   useEffect(() => {
     setPaheliCurrentPage(1);
@@ -460,6 +738,17 @@ export default function App() {
     }
   };
 
+  // Open Admin CMS directly to specified tab
+  const handleOpenAdminCMSWithTab = (tab: 'records' | 'memberships' | 'suggestions' | 'pendingWords' | 'news' | 'paheliyanCms' | 'shodhSansthanCms' | 'patrikaCms' | 'layoutSettings' | 'editDictionary' | 'security' | 'addWord') => {
+    setAdminTab(tab);
+    if (isAdminAuthenticated) {
+      loadAllAdminRecords();
+      setShowAdminRecordsModal(true);
+    } else {
+      setShowPasswordModal(true);
+    }
+  };
+
   // Open Add Word flow directly
   const handleOpenAddWord = () => {
     if (isAdminAuthenticated) {
@@ -500,10 +789,292 @@ export default function App() {
     }, 2000);
   };
 
-  const handleDeleteNewsItem = (id: string) => {
-    if (confirm("क्या आप इस समाचार को हटाना चाहते हैं?")) {
+  // Admin Handler: Save Edited News Item
+  const handleSaveNewsItemEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingNewsItem) return;
+
+    const updated = newsItems.map(item => item.id === editingNewsItem.id ? editingNewsItem : item);
+    setNewsItems(updated);
+    setEditingNewsItem(null);
+    setNewsSuccess(true);
+    setTimeout(() => setNewsSuccess(false), 2500);
+    alert('✓ समाचार का विवरण सफलतापूर्वक अपडेट कर दिया गया!');
+  };
+
+  // Admin Handler: Delete News Item
+  const handleDeleteNewsItem = (id: string, title?: string) => {
+    const snippet = title ? ` "${title}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस समाचार/घोषणा${snippet} को हटाना चाहते हैं?\n\n(Are you sure you want to delete this news item?)`);
+    if (isConfirmed) {
       const updated = newsItems.filter(item => item.id !== id);
       setNewsItems(updated);
+      if (editingNewsItem && editingNewsItem.id === id) {
+        setEditingNewsItem(null);
+      }
+      alert('✓ समाचार सफलतापूर्वक हटा दिया गया!');
+    }
+  };
+
+  // Admin Handler: Approve Pending Word Submission (Adds directly to live dictionary)
+  const handleApprovePendingWord = (wordRecord: PendingWordRecord) => {
+    const newEntry: Entry = {
+      raw_word: wordRecord.pawari,
+      clean_word: wordRecord.pawari,
+      ipa: `/${wordRecord.pawari}/`,
+      pos: wordRecord.category || 'संज्ञा (Noun)',
+      hi_meaning: wordRecord.hi_meaning,
+      en_meaning: '',
+      pawari_ex: wordRecord.pawari_ex || '',
+      hi_ex: wordRecord.hi_ex || '',
+      en_ex: '',
+      notes: `योगदानकर्ता: ${wordRecord.contributor || 'लोक प्रयोक्ता'} (${wordRecord.date})`,
+      isCustom: true,
+      id: `WORD-${Date.now()}`
+    };
+
+    const updatedCustom = [newEntry, ...customEntries];
+    setCustomEntries(updatedCustom);
+    localStorage.setItem('custom_pawari_entries', JSON.stringify(updatedCustom));
+
+    const updatedPending = adminPendingWords.map(w => w.id === wordRecord.id ? { ...w, status: 'approved' as const } : w);
+    setAdminPendingWords(updatedPending);
+    localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
+
+    alert(`✓ शब्द "${wordRecord.pawari}" सफलतापूर्वक स्वीकृत कर मुख्य शब्दकोश में जोड़ दिया गया!`);
+  };
+
+  const handleRejectPendingWord = (wordId: string) => {
+    const updatedPending = adminPendingWords.map(w => w.id === wordId ? { ...w, status: 'rejected' as const } : w);
+    setAdminPendingWords(updatedPending);
+    localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
+  };
+
+  const handleDeletePendingWordRecord = (wordId: string, wordName?: string) => {
+    const snippet = wordName ? ` "${wordName}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस शब्द सुझाव रिकॉर्ड${snippet} को हटाना चाहते हैं?\n\n(Are you sure you want to delete this word record?)`);
+    if (isConfirmed) {
+      const updatedPending = adminPendingWords.filter(w => w.id !== wordId);
+      setAdminPendingWords(updatedPending);
+      localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
+      alert('✓ शब्द सुझाव रिकॉर्ड सफलतापूर्वक हटा दिया गया!');
+    }
+  };
+
+  // Admin Handler: Add New Paheli (Riddle)
+  const handleAddPaheliSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPaheliForm.paheli.trim() || !newPaheliForm.answer.trim()) {
+      alert("कृपया पहेली और उसका सही उत्तर अवश्य दर्ज करें।");
+      return;
+    }
+
+    const newItem: PaheliItem = {
+      id: Date.now(),
+      paheli: newPaheliForm.paheli.trim(),
+      answer: newPaheliForm.answer.trim(),
+      hint: newPaheliForm.hint.trim() || 'लोक पहेली',
+      category: newPaheliForm.category.trim() || 'फलौदी / छिन्न की कहानी (पहलोड़ी)'
+    };
+
+    const updated = [newItem, ...paheliyanList];
+    setPaheliyanList(updated);
+    setNewPaheliForm({
+      paheli: '',
+      answer: '',
+      hint: '',
+      category: 'फलौदी / छिन्न की कहानी (पहलोड़ी)'
+    });
+    setPaheliCmsSuccess(true);
+    setTimeout(() => setPaheliCmsSuccess(false), 2500);
+  };
+
+  // Admin Handler: Save Edited Paheli
+  const handleSavePaheliEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPaheli) return;
+
+    const updated = paheliyanList.map(item => item.id === editingPaheli.id ? editingPaheli : item);
+    setPaheliyanList(updated);
+    setEditingPaheli(null);
+    setPaheliCmsSuccess(true);
+    setTimeout(() => setPaheliCmsSuccess(false), 2500);
+  };
+
+  // Admin Handler: Delete Paheli
+  const handleDeletePaheli = (id: number | string, paheliText?: string) => {
+    const snippet = paheliText ? `\n\n"${paheliText.length > 60 ? paheliText.slice(0, 60) + '...' : paheliText}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस पहेली को सूची से हटाना चाहते हैं?${snippet}\n\n(Are you sure you want to delete this riddle?)`);
+    if (isConfirmed) {
+      const updated = paheliyanList.filter(item => String(item.id) !== String(id));
+      setPaheliyanList(updated);
+      localStorage.setItem('pawari_paheliyan_custom_list', JSON.stringify(updated));
+      alert('✓ पहेली सफलतापूर्वक हटा दी गई!');
+    }
+  };
+
+  // Admin Handler: Reset Paheliyan to Default
+  const handleResetPaheliyanToDefault = () => {
+    if (confirm('क्या आप सभी पहेलियों को डिफ़ॉल्ट मूल 180+ पहेलियाँ सूची पर रीसेट करना चाहते हैं?')) {
+      setPaheliyanList(paheliyanData as PaheliItem[]);
+      localStorage.removeItem('pawari_paheliyan_custom_list');
+      alert('✓ पहेलियाँ मूल सूची पर रीसेट कर दी गईं!');
+    }
+  };
+
+  // Admin Handler: Save Shodh Sansthan Details
+  const handleSaveShodhSansthanSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('pawari_site_settings', JSON.stringify(siteSettings));
+    setShodhSansthanSavedSuccess(true);
+    setTimeout(() => setShodhSansthanSavedSuccess(false), 2500);
+  };
+
+  // Admin Handler: Add Sansthan Official
+  const handleAddSansthanOfficial = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSansthanOfficialForm.name || !newSansthanOfficialForm.designation) {
+      alert('कृपया नाम और पदनाम दर्ज करें!');
+      return;
+    }
+    const newOfficial: SansthanOfficial = {
+      id: 'off_' + Date.now(),
+      name: newSansthanOfficialForm.name.trim(),
+      designation: newSansthanOfficialForm.designation.trim(),
+      timePeriod: newSansthanOfficialForm.timePeriod.trim() || '2024 - वर्तमान',
+      phone: newSansthanOfficialForm.phone.trim(),
+      email: newSansthanOfficialForm.email.trim(),
+      location: newSansthanOfficialForm.location.trim(),
+      bio: newSansthanOfficialForm.bio.trim()
+    };
+
+    const updated = [newOfficial, ...sansthanOfficials];
+    setSansthanOfficials(updated);
+    localStorage.setItem('pawari_sansthan_officials', JSON.stringify(updated));
+
+    setNewSansthanOfficialForm({
+      name: '',
+      designation: 'संपादकीय मंडल सदस्य',
+      timePeriod: '2024 - वर्तमान',
+      phone: '',
+      email: '',
+      location: 'मुलताई (बैतूल)',
+      bio: ''
+    });
+    alert(`✓ नए पदाधिकारी/सदस्य "${newOfficial.name}" का विवरण सफलतापूर्वक जोड़ दिया गया!`);
+  };
+
+  // Admin Handler: Save Sansthan Official Edit
+  const handleSaveSansthanOfficialEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSansthanOfficial) return;
+
+    const updated = sansthanOfficials.map(off => off.id === editingSansthanOfficial.id ? editingSansthanOfficial : off);
+    setSansthanOfficials(updated);
+    localStorage.setItem('pawari_sansthan_officials', JSON.stringify(updated));
+
+    setEditingSansthanOfficial(null);
+    alert(`✓ पदाधिकारी "${editingSansthanOfficial.name}" का विवरण अपडेट कर दिया गया!`);
+  };
+
+  // Admin Handler: Delete Sansthan Official
+  const handleDeleteSansthanOfficial = (id: string, name: string) => {
+    if (confirm(`क्या आप संस्थान के पदाधिकारी/सदस्य "${name}" का विवरण हटाना चाहते हैं?`)) {
+      const updated = sansthanOfficials.filter(off => off.id !== id);
+      setSansthanOfficials(updated);
+      localStorage.setItem('pawari_sansthan_officials', JSON.stringify(updated));
+      alert(`✓ "${name}" का विवरण सफलतापूर्वक हटा दिया गया!`);
+    }
+  };
+
+  // Admin Handler: Reset Sansthan Officials
+  const handleResetSansthanOfficialsToDefault = () => {
+    if (confirm('क्या आप संस्थान के पदाधिकारियों की सूची मूल डेटा पर रीसेट करना चाहते हैं?')) {
+      setSansthanOfficials(DEFAULT_SANSTHAN_OFFICIALS);
+      localStorage.setItem('pawari_sansthan_officials', JSON.stringify(DEFAULT_SANSTHAN_OFFICIALS));
+      alert('✓ संस्थान पदाधिकारियों की सूची रीसेट कर दी गई!');
+    }
+  };
+
+  // Time Period Handlers (Add, Edit, Delete Time Periods)
+  const handleAddTimePeriod = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newTimePeriodInput.trim();
+    if (!trimmed) {
+      alert("कृपया समय अवधि (Time Period) दर्ज करें!");
+      return;
+    }
+    if (managedTimePeriods.includes(trimmed)) {
+      alert(`समय अवधि "${trimmed}" पहले से मौजूद है!`);
+      return;
+    }
+    const updated = [...managedTimePeriods, trimmed];
+    setManagedTimePeriods(updated);
+    localStorage.setItem('pawari_managed_time_periods', JSON.stringify(updated));
+    setNewTimePeriodInput('');
+    alert(`✓ नया कार्यकाल "${trimmed}" सफलतापूर्वक जोड़ा गया!`);
+  };
+
+  const handleSaveTimePeriodRename = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTimePeriodObj) return;
+    const oldName = editingTimePeriodObj.oldName.trim();
+    const newName = editingTimePeriodObj.newName.trim();
+    if (!newName) {
+      alert("कृपया वैध समय अवधि दर्ज करें!");
+      return;
+    }
+    if (oldName === newName) {
+      setEditingTimePeriodObj(null);
+      return;
+    }
+
+    const updatedPeriods = managedTimePeriods.map(p => p === oldName ? newName : p);
+    setManagedTimePeriods(updatedPeriods);
+    localStorage.setItem('pawari_managed_time_periods', JSON.stringify(updatedPeriods));
+
+    let affectedCount = 0;
+    const updatedOfficials = sansthanOfficials.map(off => {
+      if (off.timePeriod === oldName) {
+        affectedCount++;
+        return { ...off, timePeriod: newName };
+      }
+      return off;
+    });
+
+    if (affectedCount > 0) {
+      setSansthanOfficials(updatedOfficials);
+      localStorage.setItem('pawari_sansthan_officials', JSON.stringify(updatedOfficials));
+    }
+
+    setEditingTimePeriodObj(null);
+    alert(`✓ कार्यकाल "${oldName}" को बदलकर "${newName}" किया गया (${affectedCount} पदाधिकारी अपडेट हुए)!`);
+  };
+
+  const handleDeleteTimePeriod = (periodToDelete: string) => {
+    const officialsCount = sansthanOfficials.filter(o => o.timePeriod === periodToDelete).length;
+    let msg = `क्या आप कार्यकाल/समय अवधि "${periodToDelete}" को हटाना चाहते हैं?`;
+    if (officialsCount > 0) {
+      msg += `\n⚠️ इस कार्यकाल से ${officialsCount} पदाधिकारी जुड़े हैं। हटाने पर उनका कार्यकाल 'अन्य/अनिर्धारित' हो जाएगा।`;
+    }
+
+    if (confirm(msg)) {
+      const updatedPeriods = managedTimePeriods.filter(p => p !== periodToDelete);
+      setManagedTimePeriods(updatedPeriods);
+      localStorage.setItem('pawari_managed_time_periods', JSON.stringify(updatedPeriods));
+
+      if (officialsCount > 0) {
+        const updatedOfficials = sansthanOfficials.map(off => {
+          if (off.timePeriod === periodToDelete) {
+            return { ...off, timePeriod: 'अन्य/अनिर्धारित' };
+          }
+          return off;
+        });
+        setSansthanOfficials(updatedOfficials);
+        localStorage.setItem('pawari_sansthan_officials', JSON.stringify(updatedOfficials));
+      }
+
+      alert(`✓ कार्यकाल "${periodToDelete}" सफलतापूर्वक हटा दिया गया!`);
     }
   };
 
@@ -512,39 +1083,67 @@ export default function App() {
     e.preventDefault();
     if (!editingDictEntry) return;
 
-    const key = editingDictEntry.clean_word;
-    const updatedOverrides = {
-      ...dictionaryOverrides,
-      [key]: {
-        raw_word: editingDictEntry.raw_word,
-        clean_word: editingDictEntry.clean_word,
-        ipa: editingDictEntry.ipa,
-        pos: editingDictEntry.pos,
-        hi_meaning: editingDictEntry.hi_meaning,
-        en_meaning: editingDictEntry.en_meaning,
-        pawari_ex: editingDictEntry.pawari_ex,
-        hi_ex: editingDictEntry.hi_ex,
-        en_ex: editingDictEntry.en_ex,
-        notes: editingDictEntry.notes,
-      }
-    };
+    const oldKey = originalDictCleanWord || editingDictEntry.clean_word;
+    const newKey = editingDictEntry.clean_word.trim();
 
-    setDictionaryOverrides(updatedOverrides);
-    alert(`✅ शब्द "${editingDictEntry.clean_word}" का विवरण सफलतापूर्व अपडेट कर दिया गया!`);
+    // 1. Check if custom word
+    const isCustom = customEntries.some(c => c.clean_word === oldKey || (editingDictEntry.id && c.id === editingDictEntry.id));
+    if (isCustom) {
+      const updatedCustom = customEntries.map(c => 
+        (c.clean_word === oldKey || (editingDictEntry.id && c.id === editingDictEntry.id))
+          ? { ...c, ...editingDictEntry, clean_word: newKey }
+          : c
+      );
+      setCustomEntries(updatedCustom);
+      localStorage.setItem('custom_pawari_entries', JSON.stringify(updatedCustom));
+    } else {
+      // 2. Default dictionary word override
+      const updatedOverrides = { ...dictionaryOverrides };
+      if (oldKey && oldKey !== newKey) {
+        updatedOverrides[oldKey] = { isDeleted: true };
+      }
+      updatedOverrides[newKey] = {
+        raw_word: editingDictEntry.raw_word || newKey,
+        clean_word: newKey,
+        ipa: editingDictEntry.ipa || `/${newKey}/`,
+        pos: editingDictEntry.pos || 'संज्ञा (Noun)',
+        hi_meaning: editingDictEntry.hi_meaning,
+        en_meaning: editingDictEntry.en_meaning || '',
+        pawari_ex: editingDictEntry.pawari_ex || '',
+        hi_ex: editingDictEntry.hi_ex || '',
+        en_ex: editingDictEntry.en_ex || '',
+        notes: editingDictEntry.notes || '',
+        isDeleted: false,
+      };
+
+      setDictionaryOverrides(updatedOverrides);
+      localStorage.setItem('pawari_dictionary_overrides', JSON.stringify(updatedOverrides));
+    }
+
+    alert(`✅ शब्द "${newKey}" का विवरण सफलतापूर्वक अपडेट कर दिया गया!`);
     setEditingDictEntry(null);
+    setOriginalDictCleanWord(null);
   };
 
   const handleDeleteDictionaryEntry = (cleanWord: string) => {
-    if (confirm(`क्या आप शब्द "${cleanWord}" को कोश से हटाना/छिपाना चाहते हैं?`)) {
+    if (confirm(`क्या आप शब्द "${cleanWord}" को कोश से हटाना चाहते हैं?`)) {
       const isCustom = customEntries.some(c => c.clean_word === cleanWord);
       if (isCustom) {
-        setCustomEntries(customEntries.filter(c => c.clean_word !== cleanWord));
+        const updatedCustom = customEntries.filter(c => c.clean_word !== cleanWord);
+        setCustomEntries(updatedCustom);
+        localStorage.setItem('custom_pawari_entries', JSON.stringify(updatedCustom));
       } else {
-        setDictionaryOverrides({
+        const updatedOverrides = {
           ...dictionaryOverrides,
-          [cleanWord]: { hi_meaning: '— [एडमिन द्वारा अक्रिय कर दिया गया] —' }
-        });
+          [cleanWord]: { isDeleted: true }
+        };
+        setDictionaryOverrides(updatedOverrides);
+        localStorage.setItem('pawari_dictionary_overrides', JSON.stringify(updatedOverrides));
       }
+      if (selectedWordDetail && selectedWordDetail.clean_word === cleanWord) {
+        setSelectedWordDetail(null);
+      }
+      alert(`✓ शब्द "${cleanWord}" सफलतापूर्वक हटा दिया गया!`);
     }
   };
 
@@ -554,6 +1153,63 @@ export default function App() {
     localStorage.setItem('pawari_site_settings', JSON.stringify(siteSettings));
     setSettingsSavedSuccess(true);
     setTimeout(() => setSettingsSavedSuccess(false), 2500);
+  };
+
+  // Admin Handler: Patrika Article CRUD
+  const handleAddPatrikaArticle = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPatrikaArticleForm.title.trim() || !newPatrikaArticleForm.summary.trim()) {
+      alert("कृपया आलेख का शीर्षक एवं सार (Summary) भरें।");
+      return;
+    }
+
+    const newArticle: PatrikaArticle = {
+      id: `ART-${Date.now()}`,
+      title: newPatrikaArticleForm.title.trim(),
+      author: newPatrikaArticleForm.author.trim() || 'संपादकीय मंडल',
+      category: newPatrikaArticleForm.category,
+      summary: newPatrikaArticleForm.summary.trim(),
+      date: newPatrikaArticleForm.date.trim() || 'अगस्त 2026',
+      readTime: newPatrikaArticleForm.readTime.trim() || '5 मिनट',
+      pdfUrl: newPatrikaArticleForm.pdfUrl.trim() || 'https://pawari-research.org/pdf/sample_article.pdf',
+      articleUrl: newPatrikaArticleForm.articleUrl.trim() || `https://pawari-research.org/article/${Date.now()}`
+    };
+
+    const updated = [newArticle, ...patrikaArticles];
+    setPatrikaArticles(updated);
+    setNewPatrikaArticleForm({
+      title: '',
+      author: 'संपादकीय मंडल',
+      category: 'शोध आलेख',
+      summary: '',
+      date: 'अगस्त 2026',
+      readTime: '5 मिनट',
+      pdfUrl: '',
+      articleUrl: ''
+    });
+    setPatrikaCmsSuccess(true);
+    setTimeout(() => setPatrikaCmsSuccess(false), 2500);
+  };
+
+  const handleSavePatrikaArticleEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPatrikaArticle) return;
+
+    const updated = patrikaArticles.map(a => a.id === editingPatrikaArticle.id ? editingPatrikaArticle : a);
+    setPatrikaArticles(updated);
+    setEditingPatrikaArticle(null);
+    setPatrikaCmsSuccess(true);
+    setTimeout(() => setPatrikaCmsSuccess(false), 2500);
+  };
+
+  const handleDeletePatrikaArticle = (id: string, title?: string) => {
+    const snippet = title ? ` "${title}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस शोध आलेख${snippet} को सूची से हटाना चाहते हैं?\n\n(Are you sure you want to delete this research article?)`);
+    if (isConfirmed) {
+      const updated = patrikaArticles.filter(a => a.id !== id);
+      setPatrikaArticles(updated);
+      alert('✓ शोध आलेख सफलतापूर्वक हटा दिया गया!');
+    }
   };
 
   // Admin Handler: Security PIN Change
@@ -580,16 +1236,20 @@ export default function App() {
   const handleMembershipSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!membershipForm.name.trim() || !membershipForm.phone.trim()) {
-      alert("कृपया अपना नाम और मोबाइल नंबर भरें।");
+      alert("कृपया अपना नाम और मोबाइल नंबर अवश्य भरें।");
       return;
     }
 
     const newRecord: MembershipRecord = {
       id: `MEM-${Date.now()}`,
       name: membershipForm.name.trim(),
+      fatherName: membershipForm.fatherName.trim() || undefined,
       phone: membershipForm.phone.trim(),
+      email: membershipForm.email.trim() || undefined,
       district: membershipForm.district.trim() || 'बैतूल / अंचल',
+      village: membershipForm.village.trim() || undefined,
       knowsPawari: membershipForm.knowsPawari,
+      membershipType: membershipForm.membershipType,
       otherDetails: membershipForm.otherDetails.trim() || '—',
       date: new Date().toLocaleString('hi-IN', { dateStyle: 'medium', timeStyle: 'short' })
     };
@@ -605,14 +1265,63 @@ export default function App() {
         setShowMembershipModal(false);
         setMembershipForm({
           name: '',
+          fatherName: '',
           phone: '',
+          email: '',
           district: '',
-          knowsPawari: 'हाँ, धाराप्रवाह जानते हैं',
+          village: '',
+          knowsPawari: 'हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं',
+          membershipType: 'आजीवन सदस्य (Life Member)',
           otherDetails: ''
         });
       }, 2500);
     } catch (err) {
       console.error("Failed to save membership", err);
+    }
+  };
+
+  // Admin Handler: Direct Add New Member
+  const handleAdminAddMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminNewMemberForm.name.trim() || !adminNewMemberForm.phone.trim()) {
+      alert("कृपया सदस्य का नाम एवं मोबाइल नंबर अवश्य भरें।");
+      return;
+    }
+
+    const newRecord: MembershipRecord = {
+      id: `MEM-${Date.now()}`,
+      name: adminNewMemberForm.name.trim(),
+      fatherName: adminNewMemberForm.fatherName.trim() || undefined,
+      phone: adminNewMemberForm.phone.trim(),
+      email: adminNewMemberForm.email.trim() || undefined,
+      district: adminNewMemberForm.district.trim() || 'बैतूल',
+      village: adminNewMemberForm.village.trim() || undefined,
+      knowsPawari: adminNewMemberForm.knowsPawari,
+      membershipType: adminNewMemberForm.membershipType,
+      otherDetails: adminNewMemberForm.otherDetails.trim() || 'प्रशासनिक प्रविष्टि (Direct Admin Entry)',
+      date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+
+    try {
+      const existing: MembershipRecord[] = JSON.parse(localStorage.getItem('pawari_memberships') || '[]');
+      const updated = [newRecord, ...existing];
+      localStorage.setItem('pawari_memberships', JSON.stringify(updated));
+      setAdminMemberships(updated);
+      setAdminMemberSuccess(true);
+      setAdminNewMemberForm({
+        name: '',
+        fatherName: '',
+        phone: '',
+        email: '',
+        district: '',
+        village: '',
+        knowsPawari: 'हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं',
+        membershipType: 'आजीवन सदस्य (Life Member)',
+        otherDetails: ''
+      });
+      setTimeout(() => setAdminMemberSuccess(false), 2500);
+    } catch (err) {
+      console.error("Failed to add member by admin", err);
     }
   };
 
@@ -643,10 +1352,15 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-  const handleDeleteMembership = (id: string) => {
-    const updated = adminMemberships.filter(m => m.id !== id);
-    setAdminMemberships(updated);
-    localStorage.setItem('pawari_memberships', JSON.stringify(updated));
+  const handleDeleteMembership = (id: string, name?: string) => {
+    const snippet = name ? ` "${name}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच सदस्यता आवेदन/रिकॉर्ड${snippet} को हटाना चाहते हैं?\n\n(Are you sure you want to delete this membership record?)`);
+    if (isConfirmed) {
+      const updated = adminMemberships.filter(m => m.id !== id);
+      setAdminMemberships(updated);
+      localStorage.setItem('pawari_memberships', JSON.stringify(updated));
+      alert('✓ सदस्यता रिकॉर्ड सफलतापूर्वक हटा दिया गया!');
+    }
   };
 
   // ---------------- SUGGESTION BOX SUBMISSION ----------------
@@ -706,10 +1420,15 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-  const handleDeleteSuggestion = (id: string) => {
-    const updated = adminSuggestions.filter(s => s.id !== id);
-    setAdminSuggestions(updated);
-    localStorage.setItem('pawari_suggestions', JSON.stringify(updated));
+  const handleDeleteSuggestion = (id: string, name?: string) => {
+    const snippet = name ? ` "${name}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस सुझाव रिकॉर्ड${snippet} को हटाना चाहते हैं?\n\n(Are you sure you want to delete this suggestion record?)`);
+    if (isConfirmed) {
+      const updated = adminSuggestions.filter(s => s.id !== id);
+      setAdminSuggestions(updated);
+      localStorage.setItem('pawari_suggestions', JSON.stringify(updated));
+      alert('✓ सुझाव रिकॉर्ड सफलतापूर्वक हटा दिया गया!');
+    }
   };
 
   // ---------------- USER WORD SUGGESTION SUBMISSION ----------------
@@ -753,55 +1472,6 @@ export default function App() {
     } catch (err) {
       console.error("Failed to save word suggestion", err);
     }
-  };
-
-  // Admin Approve Pending Word
-  const handleApprovePendingWord = (pendingWord: PendingWordRecord) => {
-    // 1. Create entry for dictionary
-    const newEntry: Entry = {
-      raw_word: pendingWord.pawari,
-      clean_word: pendingWord.pawari,
-      ipa: `[${pendingWord.pawari}]`,
-      pos: pendingWord.category,
-      hi_meaning: pendingWord.hi_meaning,
-      en_meaning: '',
-      pawari_ex: pendingWord.pawari_ex,
-      hi_ex: pendingWord.hi_ex,
-      en_ex: '',
-      notes: `योगदानकर्ता: ${pendingWord.contributor} (स्वीकृत शब्द)`,
-      isCustom: true,
-      id: `APPR-${Date.now()}`
-    };
-
-    // Add to custom entries
-    const updatedCustom = [newEntry, ...customEntries];
-    setCustomEntries(updatedCustom);
-    localStorage.setItem('custom_pawari_entries', JSON.stringify(updatedCustom));
-
-    // Update status in pending list
-    const updatedPending = adminPendingWords.map(w => 
-      w.id === pendingWord.id ? { ...w, status: 'approved' as const } : w
-    );
-    setAdminPendingWords(updatedPending);
-    localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
-
-    alert(`🎉 शब्द "${pendingWord.pawari}" सफलतापूर्वक स्वीकृत किया गया और मुख्य शब्दकोश में जोड़ दिया गया!`);
-  };
-
-  // Admin Reject Pending Word
-  const handleRejectPendingWord = (id: string) => {
-    const updatedPending = adminPendingWords.map(w => 
-      w.id === id ? { ...w, status: 'rejected' as const } : w
-    );
-    setAdminPendingWords(updatedPending);
-    localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
-  };
-
-  // Admin Delete Pending Word Record
-  const handleDeletePendingWordRecord = (id: string) => {
-    const updatedPending = adminPendingWords.filter(w => w.id !== id);
-    setAdminPendingWords(updatedPending);
-    localStorage.setItem('pawari_pending_words', JSON.stringify(updatedPending));
   };
 
   // ---------------- ONE-CLICK EMAIL REPORT TO RUPESH ----------------
@@ -930,10 +1600,35 @@ export default function App() {
   };
 
   // Delete single quiz record
-  const handleDeleteSingleRecord = (id: string) => {
-    const updated = adminQuizRecords.filter(r => r.id !== id);
-    setAdminQuizRecords(updated);
-    localStorage.setItem('pawari_quiz_records', JSON.stringify(updated));
+  const handleDeleteSingleRecord = (id: string, name?: string) => {
+    const snippet = name ? ` "${name}"` : '';
+    const isConfirmed = window.confirm(`क्या आप सचमुच इस परीक्षार्थी रिकॉर्ड${snippet} को हटाना चाहते हैं?\n\n(Are you sure you want to delete this quiz record?)`);
+    if (isConfirmed) {
+      const updated = adminQuizRecords.filter(r => r.id !== id);
+      setAdminQuizRecords(updated);
+      localStorage.setItem('pawari_quiz_records', JSON.stringify(updated));
+      alert('✓ परीक्षार्थी रिकॉर्ड सफलतापूर्वक हटा दिया गया!');
+    }
+  };
+
+  // Admin Handler: Restore / Enable all deleted words & items on the site
+  const handleEnableAllDeletedItems = () => {
+    const isConfirmed = window.confirm(
+      "क्या आप साइट पर सभी हटाए गए शब्दों (Deleted Words) तथा सामग्री को पुनः सक्रिय/इनेबल (Enable/Restore) करना चाहते हैं?\n\n(Are you sure you want to enable/restore all deleted items on the site?)"
+    );
+    if (isConfirmed) {
+      // Clear isDeleted flags in dictionaryOverrides
+      const cleanedOverrides: Record<string, Partial<Entry> & { isDeleted?: boolean }> = {};
+      Object.entries(dictionaryOverrides).forEach(([wordKey, val]) => {
+        if (val && typeof val === 'object') {
+          cleanedOverrides[wordKey] = { ...(val as Record<string, unknown>), isDeleted: false };
+        }
+      });
+      setDictionaryOverrides(cleanedOverrides);
+      localStorage.setItem('pawari_dictionary_overrides', JSON.stringify(cleanedOverrides));
+
+      alert("✓ सफलता! साइट पर सभी हटाए गए शब्द एवं सामग्रियां पुनः सक्रिय (Enable) कर दी गई हैं!");
+    }
   };
 
   // Handle new word submission
@@ -974,11 +1669,14 @@ export default function App() {
 
   // Delete custom added word
   const handleDeleteCustomWord = (wordId: string) => {
-    if (confirm("क्या आप इस शब्द को कोश से हटाना चाहते हैं?")) {
-      setCustomEntries(prev => prev.filter(e => e.id !== wordId));
+    if (window.confirm("क्या आप इस शब्द को कोश से हटाना चाहते हैं?\n\n(Are you sure you want to delete this word?)")) {
+      const updated = customEntries.filter(e => e.id !== wordId);
+      setCustomEntries(updated);
+      localStorage.setItem('custom_pawari_entries', JSON.stringify(updated));
       if (selectedWordDetail && selectedWordDetail.id === wordId) {
         setSelectedWordDetail(null);
       }
+      alert('✓ शब्द सफलतापूर्वक हटा दिया गया!');
     }
   };
 
@@ -1157,14 +1855,30 @@ export default function App() {
               </button>
             )}
 
-            <button
-              onClick={() => setShowSuggestWordModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-amber-800 hover:bg-amber-700 text-amber-50 border border-amber-600 shadow shrink-0"
-              title="नया पँवारी शब्द योगदान करें"
-            >
-              <PlusCircle className="w-4 h-4 text-amber-300" />
-              <span>➕ नया शब्द सुझाएं</span>
-            </button>
+            {siteSettings.showPatrikaSection !== false && (
+              <button
+                onClick={() => setActiveTab('patrika')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer ${
+                  activeTab === 'patrika'
+                    ? 'bg-amber-700 text-amber-50 shadow border border-amber-600'
+                    : 'hover:bg-stone-800 text-stone-300'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-amber-300" />
+                <span>📚 संस्थान पत्रिका ({patrikaArticles.length})</span>
+              </button>
+            )}
+
+            {siteSettings.showSuggestWordButton !== false && (
+              <button
+                onClick={() => setShowSuggestWordModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition cursor-pointer bg-amber-800 hover:bg-amber-700 text-amber-50 border border-amber-600 shadow shrink-0"
+                title="नया पँवारी शब्द योगदान करें"
+              >
+                <PlusCircle className="w-4 h-4 text-amber-300" />
+                <span>➕ नया शब्द सुझाएं</span>
+              </button>
+            )}
 
             <button
               onClick={handleOpenAdminPanel}
@@ -1262,34 +1976,36 @@ export default function App() {
           </div>
 
           {/* Alphabet Bar (अ से ह) */}
-          <div className="pt-2">
-            <div className="text-xs font-semibold uppercase tracking-wider text-amber-400/90 mb-2 flex items-center justify-between">
-              <span>वर्णानुक्रम सूचकांक (Devanagari Alphabet Index):</span>
-              {selectedAlphabet !== 'सब' && (
-                <button
-                  onClick={() => setSelectedAlphabet('सब')}
-                  className="text-amber-300 hover:underline text-[11px]"
-                >
-                  फ़िल्टर हटाएं (Reset)
-                </button>
-              )}
+          {(siteSettings.showAlphabetGrid ?? true) && (
+            <div className="pt-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-amber-400/90 mb-2 flex items-center justify-between">
+                <span>वर्णानुक्रम सूचकांक (Devanagari Alphabet Index):</span>
+                {selectedAlphabet !== 'सब' && (
+                  <button
+                    onClick={() => setSelectedAlphabet('सब')}
+                    className="text-amber-300 hover:underline text-[11px]"
+                  >
+                    फ़िल्टर हटाएं (Reset)
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1 p-1.5 bg-stone-950/60 rounded-xl border border-stone-800 max-h-24 overflow-y-auto">
+                {alphabets.map((letter) => (
+                  <button
+                    key={letter}
+                    onClick={() => setSelectedAlphabet(letter)}
+                    className={`px-2.5 py-1 text-xs font-medium rounded-lg transition cursor-pointer ${
+                      selectedAlphabet === letter
+                        ? 'bg-amber-600 text-stone-950 font-bold shadow'
+                        : 'bg-stone-800/80 text-stone-300 hover:bg-stone-700 hover:text-amber-200 border border-stone-700/50'
+                    }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-1 p-1.5 bg-stone-950/60 rounded-xl border border-stone-800 max-h-24 overflow-y-auto">
-              {alphabets.map((letter) => (
-                <button
-                  key={letter}
-                  onClick={() => setSelectedAlphabet(letter)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-lg transition cursor-pointer ${
-                    selectedAlphabet === letter
-                      ? 'bg-amber-600 text-stone-950 font-bold shadow'
-                      : 'bg-stone-800/80 text-stone-300 hover:bg-stone-700 hover:text-amber-200 border border-stone-700/50'
-                  }`}
-                >
-                  {letter}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
         </div>
       </section>
@@ -1300,6 +2016,45 @@ export default function App() {
         {/* ================= TAB 1: DICTIONARY TAB ================= */}
         {activeTab === 'dictionary' && (
           <>
+            {/* DICTIONARY ADMIN QUICK CMS BAR */}
+            <div className="bg-stone-900 text-amber-100 p-3.5 rounded-2xl border border-amber-800/60 flex flex-wrap items-center justify-between gap-3 text-xs font-bold shadow-md">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-amber-400" />
+                <span>📖 शब्दकोश एडमिन CMS (2,740+ शब्द प्रबंधन)</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('editDictionary')}
+                  className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 text-amber-50 rounded-xl text-xs font-bold border border-amber-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-amber-200" />
+                  <span>📖 2,740+ शब्द संपादक</span>
+                </button>
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('pendingWords')}
+                  className="px-3 py-1.5 bg-amber-800 hover:bg-amber-700 text-amber-200 rounded-xl text-xs font-bold border border-amber-600 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+                  <span>📥 शब्द स्वीकृति ({adminPendingWords.filter(w => w.status === 'pending').length} लंबित)</span>
+                </button>
+                <button
+                  onClick={handleOpenAddWord}
+                  className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold border border-emerald-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>+ नया शब्द जोड़ें</span>
+                </button>
+                <button
+                  onClick={handleEnableAllDeletedItems}
+                  className="px-3 py-1.5 bg-stone-800 hover:bg-stone-700 text-amber-200 rounded-xl text-xs font-bold border border-amber-800/60 shadow cursor-pointer flex items-center gap-1.5 transition"
+                  title="साइट पर सभी हटाए गए शब्दों व सामग्री को पुनः सक्रिय/इनेबल करें"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+                  <span>🔄 सभी हटाए गए शब्द/सामग्री इनेबल करें</span>
+                </button>
+              </div>
+            </div>
+
             {/* QUIZ PROMO BANNER FOR DICTIONARY WORDS */}
             <div className="bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 text-stone-100 p-4 sm:p-5 rounded-2xl shadow-md border border-amber-800/60 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -1474,7 +2229,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {paginatedEntries.map((entry, idx) => {
                   const isBookmarked = bookmarks.includes(entry.clean_word);
-                  const wordId = entry.id || `word_${idx}_${entry.clean_word}`;
+                  const wordId = `grid_${entry.clean_word}_${idx}`;
 
                   return (
                     <div
@@ -1561,15 +2316,24 @@ export default function App() {
                             <span>{copiedWord === entry.clean_word ? "Copied" : "Copy"}</span>
                           </button>
 
-                          {entry.isCustom && (
+                          {isAdminAuthenticated ? (
+                            <button
+                              onClick={() => handleDeleteDictionaryEntry(entry.clean_word)}
+                              className="p-1 text-rose-600 hover:text-rose-800 transition cursor-pointer flex items-center gap-0.5 text-[11px] font-bold"
+                              title="शब्द हटाएं"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>हटाएं</span>
+                            </button>
+                          ) : entry.isCustom ? (
                             <button
                               onClick={() => handleDeleteCustomWord(entry.id!)}
-                              className="p-1 text-red-500 hover:text-red-700 transition"
+                              className="p-1 text-rose-500 hover:text-rose-700 transition cursor-pointer"
                               title="हटाएं"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
-                          )}
+                          ) : null}
 
                           <button
                             onClick={() => setSelectedWordDetail(entry)}
@@ -1602,7 +2366,7 @@ export default function App() {
                     </thead>
                     <tbody className="divide-y divide-stone-200">
                       {paginatedEntries.map((entry, idx) => (
-                        <tr key={entry.id || idx} className="hover:bg-amber-50/40 transition">
+                        <tr key={`tbl_${entry.clean_word}_${idx}`} className="hover:bg-amber-50/40 transition">
                           <td className="p-3.5 font-bold font-serif text-stone-900">
                             <button 
                               onClick={() => setSelectedWordDetail(entry)}
@@ -1630,6 +2394,15 @@ export default function App() {
                             >
                               देखें
                             </button>
+                            {isAdminAuthenticated && (
+                              <button
+                                onClick={() => handleDeleteDictionaryEntry(entry.clean_word)}
+                                className="p-1 text-rose-600 hover:text-rose-800 transition font-semibold"
+                                title="हटाएं"
+                              >
+                                <Trash2 className="w-4 h-4 inline" />
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -1697,6 +2470,30 @@ export default function App() {
         {/* ================= TAB 2: PAHELIYAN / RIDDLES PRACTICE & QUIZ ================= */}
         {activeTab === 'paheliyan' && (
           <div className="space-y-6">
+            
+            {/* PAHELIYAN ADMIN CMS BAR */}
+            <div className="bg-stone-900 text-amber-100 p-3.5 rounded-2xl border border-amber-800/60 flex flex-wrap items-center justify-between gap-3 text-xs font-bold shadow-md">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-amber-400" />
+                <span>🧩 पहेलियाँ एडमिन CMS (Paheliyan CMS)</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('paheliyanCms')}
+                  className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-600 text-amber-50 rounded-xl text-xs font-bold border border-amber-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-amber-200" />
+                  <span>🧩 पहेलियाँ सम्पादक / CMS (180+)</span>
+                </button>
+                <button
+                  onClick={handleResetPaheliyanToDefault}
+                  className="px-3 py-1.5 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-bold border border-stone-700 cursor-pointer flex items-center gap-1 transition"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>मूल 180+ पहेलियाँ रीसेट</span>
+                </button>
+              </div>
+            </div>
             
             {/* Paheliyan Banner */}
             <div className="bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 text-stone-100 p-6 rounded-2xl shadow-md border border-amber-800/50 space-y-3">
@@ -1796,7 +2593,7 @@ export default function App() {
                     const isRevealed = revealedAnswers[item.id] || false;
                     return (
                       <div
-                        key={item.id}
+                        key={`pah_${item.id}_${idx}`}
                         className="bg-white rounded-2xl shadow-sm border border-stone-200 hover:border-amber-400 p-5 flex flex-col justify-between transition space-y-4"
                       >
                         <div className="space-y-3">
@@ -1987,7 +2784,102 @@ export default function App() {
 
         {/* ================= TAB 3: CERTIFICATE QUIZ SECTION ================= */}
         {activeTab === 'quiz' && (
-          <PawariQuizSection key={selectedQuizType} initialType={selectedQuizType} />
+          <div className="space-y-4">
+            <div className="bg-stone-900 text-amber-100 p-3.5 rounded-2xl border border-amber-800/60 flex flex-wrap items-center justify-between gap-3 text-xs font-bold shadow-md">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-400" />
+                <span>🏆 ई-क्विज़ एडमिन रिकॉर्ड्स & CMS</span>
+              </div>
+              <button
+                onClick={() => handleOpenAdminCMSWithTab('records')}
+                className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-600 text-amber-50 rounded-xl text-xs font-bold border border-amber-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+              >
+                <BarChart2 className="w-3.5 h-3.5 text-amber-200" />
+                <span>⚙️ परीक्षार्थी रिकॉर्ड्स & एडमिन CMS</span>
+              </button>
+            </div>
+            <PawariQuizSection key={selectedQuizType} initialType={selectedQuizType} />
+          </div>
+        )}
+
+        {/* ================= TAB 4: NEWS & ANNOUNCEMENTS SECTION ================= */}
+        {activeTab === 'news' && (
+          <div className="space-y-4">
+            <div className="bg-stone-900 text-amber-100 p-3.5 rounded-2xl border border-amber-800/60 flex flex-wrap items-center justify-between gap-3 text-xs font-bold shadow-md">
+              <div className="flex items-center gap-2">
+                <Newspaper className="w-4 h-4 text-amber-400" />
+                <span>📰 समाचार व घोषणाएं एडमिन CMS</span>
+              </div>
+              <button
+                onClick={() => handleOpenAdminCMSWithTab('news')}
+                className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-600 text-amber-50 rounded-xl text-xs font-bold border border-amber-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-amber-200" />
+                <span>⚙️ समाचार जोडें व सम्पादित करें (CMS)</span>
+              </button>
+            </div>
+            <NewsSection
+              newsItems={newsItems}
+              isAdminAuthenticated={isAdminAuthenticated}
+              onOpenNewsCMS={() => handleOpenAdminCMSWithTab('news')}
+              onDeleteNewsItem={handleDeleteNewsItem}
+              onEditNewsItem={(item) => {
+                setEditingNewsItem(item);
+                handleOpenAdminCMSWithTab('news');
+              }}
+            />
+          </div>
+        )}
+
+        {/* ================= TAB 5: SANSTHAN PATRIKA SECTION ================= */}
+        {activeTab === 'patrika' && (
+          <div className="space-y-4">
+            <div className="bg-stone-900 text-amber-100 p-3.5 rounded-2xl border border-amber-800/60 flex flex-wrap items-center justify-between gap-3 text-xs font-bold shadow-md">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-amber-400" />
+                <span>📚 शोध पत्रिका व माँ ताप्ती संस्थान CMS</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('patrikaCms')}
+                  className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-600 text-amber-50 rounded-xl text-xs font-bold border border-amber-500 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-amber-200" />
+                  <span>📚 पत्रिका आलेख CMS</span>
+                </button>
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('shodhSansthanCms')}
+                  className="px-3.5 py-1.5 bg-stone-800 hover:bg-stone-700 text-amber-300 rounded-xl text-xs font-bold border border-amber-800/40 cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>🏛️ संस्थान विवरण CMS</span>
+                </button>
+                <button
+                  onClick={() => handleOpenAdminCMSWithTab('memberships')}
+                  className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-emerald-50 rounded-xl text-xs font-bold border border-emerald-600 shadow cursor-pointer flex items-center gap-1.5 transition"
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>👥 सदस्य प्रबंधन ({adminMemberships.length})</span>
+                </button>
+              </div>
+            </div>
+            <PatrikaSection
+              siteSettings={siteSettings}
+              patrikaArticles={patrikaArticles}
+              sansthanOfficials={sansthanOfficials}
+              isAdminAuthenticated={isAdminAuthenticated}
+              onOpenAdminTab={(tab) => {
+                setShowAdminRecordsModal(true);
+                setAdminTab(tab);
+              }}
+              onOpenSuggestionModal={() => setShowSuggestionBoxModal(true)}
+              onDeletePatrikaArticle={handleDeletePatrikaArticle}
+              onEditPatrikaArticle={(article) => {
+                setEditingPatrikaArticle(article);
+                handleOpenAdminCMSWithTab('patrikaCms');
+              }}
+            />
+          </div>
         )}
 
         {/* 3.5 SEO & LINGUISTIC KNOWLEDGE BASE SECTION */}
@@ -2148,14 +3040,14 @@ export default function App() {
             <div className="space-y-3">
               <h3 className="text-lg font-serif font-bold text-amber-100 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-amber-400" />
-                पँवारी (भोयरी) शब्दकोश
+                {siteSettings.siteTitle || "पँवारी (भोयरी) शब्दकोश"}
               </h3>
               <p className="text-xs leading-relaxed text-stone-400">
-                रुनुक-झुनुक पवारी शब्दकोश (मूल संकलनकर्ता: वल्लभ डोंगरे, सतपुड़ा संस्कृति संस्थान, भोपाल)। सतपुड़ा अंचल (छिंदवाड़ा, बालाघाट, सिवनी, बैतूल, नागपुर, गोंदिया, भंडारा) की पवार क्षत्रिय बोली का संरक्षण।
+                {siteSettings.footerText || "रुनुक-झुनुक पवारी शब्दकोश (मूल संकलनकर्ता: वल्लभ डोंगरे, सतपुड़ा संस्कृति संस्थान, भोपाल)। सतपुड़ा अंचल (छिंदवाड़ा, बालाघाट, सिवनी, बैतूल, नागपुर, गोंदिया, भंडारा) की पवार क्षत्रिय बोली का संरक्षण।"}
               </p>
               <div className="pt-1 text-xs text-amber-300 font-semibold flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>माँ ताप्ती शोध संस्थान, मुलताई (बैतूल) एवं पँवारी शोध पत्रिका से संबद्ध।</span>
+                <span>{siteSettings.shodhSansthanOrg || "माँ ताप्ती शोध संस्थान, मुलताई (बैतूल) एवं पँवारी शोध पत्रिका से संबद्ध।"}</span>
               </div>
             </div>
 
@@ -2163,23 +3055,27 @@ export default function App() {
             <div className="space-y-3 bg-stone-950/80 p-4 rounded-xl border border-stone-800">
               <h4 className="text-sm font-bold text-amber-300 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-amber-400" />
-                माँ ताप्ती शोध संस्थान, मुलताई
+                {siteSettings.shodhSansthanTitle || "माँ ताप्ती शोध संस्थान, मुलताई"}
               </h4>
               <p className="text-xs text-stone-300 leading-relaxed">
-                पँवारी बोली, लोक-साहित्य, इतिहास एवं सांस्कृतिक विरासत के संरक्षण तथा पँवारी शोध पत्रिका में रचना सहयोग हेतु संपर्क करें।
+                {siteSettings.shodhSansthanDescription || "पँवारी बोली, लोक-साहित्य, इतिहास एवं सांस्कृतिक विरासत के संरक्षण तथा पँवारी शोध पत्रिका में रचना सहयोग हेतु संपर्क करें।"}
               </p>
-              <div className="pt-1 flex items-center gap-3">
+              <div className="pt-1 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={() => setShowAboutModal(true)}
-                  className="inline-flex items-center gap-1 text-xs text-amber-400 font-bold hover:underline cursor-pointer"
+                  onClick={() => {
+                    setActiveTab('patrika');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs text-amber-300 font-bold hover:text-amber-100 hover:underline cursor-pointer bg-amber-950/80 px-3 py-1.5 rounded-xl border border-amber-800/80 transition shadow-sm"
+                  title="माँ ताप्ती शोध संस्थान विवरण एवं शोध पत्रिका पृष्ठ पर जाएं"
                 >
-                  संस्थान परिचय देखें <ChevronRight className="w-3 h-3" />
+                  <span>संस्थान परिचय व विवरण देखें</span> <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
                 </button>
                 <button
                   onClick={() => setShowMembershipModal(true)}
-                  className="inline-flex items-center gap-1 text-xs text-emerald-400 font-bold hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs text-emerald-400 font-bold hover:text-emerald-300 hover:underline cursor-pointer bg-emerald-950/60 px-3 py-1.5 rounded-xl border border-emerald-800/60 transition"
                 >
-                  आवेदन भरें <ChevronRight className="w-3 h-3" />
+                  <span>आवेदन भरें</span> <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
                 </button>
               </div>
             </div>
@@ -2196,11 +3092,11 @@ export default function App() {
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
                   <a
-                    href="mailto:rupeshpawar10@gmail.com?subject=Pawari Dictionary Suggestion"
+                    href={`mailto:${siteSettings.shodhSansthanEmail || 'rupeshpawar10@gmail.com'}?subject=Pawari Dictionary Suggestion`}
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-800/80 hover:bg-amber-700 text-amber-100 rounded-lg text-xs font-bold transition border border-amber-600/40"
                   >
                     <Send className="w-3.5 h-3.5 text-amber-300" />
-                    rupeshpawar10@gmail.com
+                    {siteSettings.shodhSansthanEmail || 'rupeshpawar10@gmail.com'}
                   </a>
                   <button
                     onClick={() => setShowSuggestionBoxModal(true)}
@@ -2226,10 +3122,20 @@ export default function App() {
 
           <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-stone-500 gap-4 pt-2">
             <div>
-              © 2026 पँवारी Pawari (Bhoyari) Digital Dictionary Project. सर्वाधिकार सुरक्षित।
+              {siteSettings.footerCopyright || "© 2026 पँवारी Pawari (Bhoyari) Digital Dictionary Project. सर्वाधिकार सुरक्षित।"}
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <button onClick={() => setShowAboutModal(true)} className="hover:text-amber-300 cursor-pointer">कोश परिचय</button>
+              <span>•</span>
+              <button
+                onClick={() => {
+                  setActiveTab('patrika');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="hover:text-amber-300 font-bold text-amber-400 cursor-pointer"
+              >
+                संस्थान परिचय (Sansthan Details)
+              </button>
               <span>•</span>
               <button onClick={() => setShowMembershipModal(true)} className="hover:text-amber-300 cursor-pointer">संस्थान सहभागिता</button>
               <span>•</span>
@@ -2313,6 +3219,16 @@ export default function App() {
               </button>
 
               <div className="flex items-center gap-2">
+                {isAdminAuthenticated && (
+                  <button
+                    onClick={() => handleDeleteDictionaryEntry(selectedWordDetail.clean_word)}
+                    className="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                    title="शब्द हटाएं"
+                  >
+                    <Trash2 className="w-4 h-4 text-rose-700" />
+                    <span>शब्द हटाएं</span>
+                  </button>
+                )}
                 <button
                   onClick={() => handleCopyWord(selectedWordDetail)}
                   className="px-3 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded-lg text-xs font-semibold transition"
@@ -2569,6 +3485,85 @@ export default function App() {
         </div>
       )}
 
+      {/* ================= MODAL 4: SANSTHAN & DICTIONARY ABOUT MODAL ================= */}
+      {showAboutModal && (
+        <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full border border-amber-400 overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in duration-200">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-stone-100 p-5 border-b border-amber-800 flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-500/20 text-amber-300 rounded-xl border border-amber-500/30">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-serif font-bold text-amber-100">
+                    माँ ताप्ती शोध संस्थान, मुलताई (बैतूल)
+                  </h2>
+                  <p className="text-xs text-amber-300/90 font-medium">
+                    पँवारी (भोयरी) भाषा, लोक-साहित्य एवं सांस्कृतिक शोध केंद्र
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setShowAboutModal(false)} className="text-stone-400 hover:text-white p-1 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5 overflow-y-auto text-xs text-stone-700 leading-relaxed">
+              <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 space-y-2">
+                <h3 className="font-serif font-bold text-stone-900 text-sm flex items-center gap-1.5 text-amber-900">
+                  <Sparkles className="w-4 h-4 text-amber-700" />
+                  संस्थान उद्देश्य एवं परिचय (Sansthan Overview)
+                </h3>
+                <p>
+                  <strong>माँ ताप्ती शोध संस्थान मुलताई (जिला बैतूल, म.प्र.)</strong> सतपुड़ा अंचल की पौराणिक एवं ऐतिहासिक धरोहर पँवारी (भोयरी) बोली, लोक-साहित्य, शोध पत्रिकाओं, लोकगीतों, मुहावरों एवं संस्कृति के संवर्धन एवं संरक्षण हेतु कार्य कर रहा है।
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-bold text-stone-900 text-xs uppercase tracking-wider text-amber-800">
+                  मुख्य कार्य एवं गतिविधियाँ (Core Initiatives)
+                </h4>
+                <ul className="list-disc pl-5 space-y-1.5 text-stone-700">
+                  <li><strong>पँवारी शोध पत्रिका:</strong> त्रैमासिक शोध पत्रिका का सम्पादन, प्रकाशन एवं डिजिटल अर्काइव।</li>
+                  <li><strong>डिजिटल पँवारी शब्दकोश:</strong> 2,740+ पँवारी शब्दों, मुहावरों एवं IPA उच्चारण का संकलन।</li>
+                  <li><strong>लोक-साहित्य संकलन:</strong> पँवारी लोक-पहेलियाँ, लोकगीत, कहावतें एवं शोध आलेख।</li>
+                  <li><strong>सदस्यता एवं शोध प्रोत्साहन:</strong> अंचल के शोधार्थियों, युवा लेखकों एवं भाषाप्रेमियों को जोड़ना।</li>
+                </ul>
+              </div>
+
+              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-stone-700 space-y-1">
+                <div className="font-bold text-stone-900">मूल संकलनकर्ता व प्रेरणास्रोत:</div>
+                <div>वल्लभ डोंगरे (सतपुड़ा संस्कृति संस्थान, भोपाल) • रूपेश पवार (प्रधान संपादक)</div>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-stone-200">
+                <button
+                  onClick={() => {
+                    setShowAboutModal(false);
+                    setActiveTab('patrika');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>संस्थान विवरण व पत्रिका पृष्ठ पर जाएं (Sansthan Details Page)</span>
+                </button>
+                <button
+                  onClick={() => setShowAboutModal(false)}
+                  className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold rounded-xl cursor-pointer"
+                >
+                  बंद करें
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* ================= MODAL 6: MEMBERSHIP FORM (माँ ताप्ती शोध संस्थान मुलताई से जुड़ें) ================= */}
       {showMembershipModal && (
         <div className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2607,62 +3602,119 @@ export default function App() {
                     पँवारी (भोयरी) भाषा, लोक-साहित्य, शोध एवं सांस्कृतिक विरासत के संरक्षण हेतु माँ ताप्ती शोध संस्थान मुलताई से जुड़ने हेतु अपनी जानकारी भरें:
                   </p>
 
-                  <div>
-                    <label className="block font-bold text-stone-800 mb-1">
-                      आपका नाम (Full Name) <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={membershipForm.name}
-                      onChange={(e) => setMembershipForm({...membershipForm, name: e.target.value})}
-                      placeholder="उदा. राजेश बारंगे पंवार / सुनीता पवार"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        आपका नाम (Full Name) <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={membershipForm.name}
+                        onChange={(e) => setMembershipForm({...membershipForm, name: e.target.value})}
+                        placeholder="उदा. राजेश बारंगे पंवार"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block font-bold text-stone-800 mb-1">
-                      मोबाइल / व्हाट्सएप नंबर (Mobile / WhatsApp) <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={membershipForm.phone}
-                      onChange={(e) => setMembershipForm({...membershipForm, phone: e.target.value})}
-                      placeholder="उदा. 98260XXXXX"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
-                    />
-                  </div>
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        पिता / पति का नाम (Father/Husband Name)
+                      </label>
+                      <input
+                        type="text"
+                        value={membershipForm.fatherName}
+                        onChange={(e) => setMembershipForm({...membershipForm, fatherName: e.target.value})}
+                        placeholder="उदा. श्री रामेश्वर पवार"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block font-bold text-stone-800 mb-1">
-                      जिला / अंचल (District / Area) <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={membershipForm.district}
-                      onChange={(e) => setMembershipForm({...membershipForm, district: e.target.value})}
-                      placeholder="उदा. बैतूल, छिंदवाड़ा, पांढुर्णा, नागपुर, वर्धा, अमरावती..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                    />
-                  </div>
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        मोबाइल / व्हाट्सएप नंबर (Mobile / WhatsApp) <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={membershipForm.phone}
+                        onChange={(e) => setMembershipForm({...membershipForm, phone: e.target.value})}
+                        placeholder="उदा. 98260XXXXX"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block font-bold text-stone-800 mb-1">
-                      क्या आप पँवारी (भोयरी) जानते हैं?
-                    </label>
-                    <select
-                      value={membershipForm.knowsPawari}
-                      onChange={(e) => setMembershipForm({...membershipForm, knowsPawari: e.target.value})}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-medium"
-                    >
-                      <option value="हाँ, धाराप्रवाह जानते हैं">हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं</option>
-                      <option value="हाँ, थोड़ा-बहुत जानते/समझते हैं">हाँ, थोड़ा-बहुत जानते एवं समझते हैं</option>
-                      <option value="नहीं, लेकिन सीखना चाहते हैं">नहीं, लेकिन पँवारी सीखना एवं समझना चाहते हैं</option>
-                      <option value="अन्य शोधार्थी / भाषाप्रेमी">अन्य (शोधार्थी / संस्कृति प्रेमी)</option>
-                    </select>
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        ईमेल ID (Email Address)
+                      </label>
+                      <input
+                        type="email"
+                        value={membershipForm.email}
+                        onChange={(e) => setMembershipForm({...membershipForm, email: e.target.value})}
+                        placeholder="उदा. example@gmail.com"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        जिला / अंचल (District) <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={membershipForm.district}
+                        onChange={(e) => setMembershipForm({...membershipForm, district: e.target.value})}
+                        placeholder="उदा. बैतूल, छिंदवाड़ा, पांढुर्णा, नागपुर..."
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        तहसील / ग्राम / नगर (Town / Village)
+                      </label>
+                      <input
+                        type="text"
+                        value={membershipForm.village}
+                        onChange={(e) => setMembershipForm({...membershipForm, village: e.target.value})}
+                        placeholder="उदा. मुलताई / प्रभातपट्टन"
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        सदस्यता श्रेणी (Membership Category)
+                      </label>
+                      <select
+                        value={membershipForm.membershipType}
+                        onChange={(e) => setMembershipForm({...membershipForm, membershipType: e.target.value})}
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-medium"
+                      >
+                        <option value="आजीवन सदस्य (Life Member)">आजीवन सदस्य (Life Member)</option>
+                        <option value="शोधार्थी सदस्य (Research Scholar)">शोधार्थी सदस्य (Research Scholar)</option>
+                        <option value="संरक्षक सदस्य (Patron Member)">संरक्षक सदस्य (Patron Member)</option>
+                        <option value="साधारण सदस्य (General Member)">साधारण सदस्य (General Member)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 mb-1">
+                        पँवारी (भोयरी) भाषा ज्ञान
+                      </label>
+                      <select
+                        value={membershipForm.knowsPawari}
+                        onChange={(e) => setMembershipForm({...membershipForm, knowsPawari: e.target.value})}
+                        className="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-medium"
+                      >
+                        <option value="हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं">हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं</option>
+                        <option value="हाँ, थोड़ा-बहुत जानते/समझते हैं">हाँ, थोड़ा-बहुत जानते एवं समझते हैं</option>
+                        <option value="नहीं, लेकिन सीखना चाहते हैं">नहीं, लेकिन पँवारी सीखना एवं समझना चाहते हैं</option>
+                        <option value="अन्य शोधार्थी / भाषाप्रेमी">अन्य (शोधार्थी / संस्कृति प्रेमी)</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -3061,7 +4113,43 @@ export default function App() {
                 }`}
               >
                 <Newspaper className="w-4 h-4 text-amber-500" />
-                <span>5. 📰 समाचार व घोषणाएं ({newsItems.length})</span>
+                <span>5. 📰 समाचार CMS ({newsItems.length})</span>
+              </button>
+
+              <button
+                onClick={() => setAdminTab('paheliyanCms')}
+                className={`px-3 py-2 rounded-xl flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+                  adminTab === 'paheliyanCms'
+                    ? 'bg-amber-800 text-white shadow'
+                    : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                }`}
+              >
+                <HelpCircle className="w-4 h-4 text-amber-500" />
+                <span>6. 🧩 पहेलियाँ CMS ({paheliyanList.length})</span>
+              </button>
+
+              <button
+                onClick={() => setAdminTab('shodhSansthanCms')}
+                className={`px-3 py-2 rounded-xl flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+                  adminTab === 'shodhSansthanCms'
+                    ? 'bg-amber-800 text-white shadow'
+                    : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                }`}
+              >
+                <FileText className="w-4 h-4 text-amber-500" />
+                <span>7. 🏛️ संस्थान विवरण CMS</span>
+              </button>
+
+              <button
+                onClick={() => setAdminTab('patrikaCms')}
+                className={`px-3 py-2 rounded-xl flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+                  adminTab === 'patrikaCms'
+                    ? 'bg-amber-800 text-white shadow'
+                    : 'bg-white text-stone-700 hover:bg-stone-200 border border-stone-300'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-amber-500" />
+                <span>8. 📚 संस्थान पत्रिका CMS ({patrikaArticles.length})</span>
               </button>
 
               <button
@@ -3073,7 +4161,7 @@ export default function App() {
                 }`}
               >
                 <Sliders className="w-4 h-4 text-amber-500" />
-                <span>6. 🎨 वेबसाइट सेटिंग्स & लेआउट</span>
+                <span>9. 🎨 थीम व लेआउट CMS</span>
               </button>
 
               <button
@@ -3085,7 +4173,7 @@ export default function App() {
                 }`}
               >
                 <Edit3 className="w-4 h-4 text-amber-500" />
-                <span>7. 📖 2,740+ शब्द संपादक</span>
+                <span>10. 📖 2,740+ शब्द संपादक</span>
               </button>
 
               <button
@@ -3097,7 +4185,7 @@ export default function App() {
                 }`}
               >
                 <Key className="w-4 h-4 text-amber-500" />
-                <span>8. 🔒 सुरक्षा व PIN</span>
+                <span>10. 🔒 सुरक्षा व PIN</span>
               </button>
 
               <button
@@ -3193,9 +4281,9 @@ export default function App() {
                               </td>
                               <td className="p-3 text-right">
                                 <button
-                                  onClick={() => handleDeleteSingleRecord(rec.id)}
+                                  onClick={() => handleDeleteSingleRecord(rec.id, rec.name)}
                                   className="p-1 text-stone-400 hover:text-rose-600 transition cursor-pointer"
-                                  title="रिकॉर्ड बताएं"
+                                  title="रिकॉर्ड हटाएं"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -3209,25 +4297,187 @@ export default function App() {
                 </div>
               )}
 
-              {/* TAB 2: MEMBERSHIP APPLICATIONS */}
+              {/* TAB 2: MEMBERSHIP APPLICATIONS & ADD NEW MEMBER */}
               {adminTab === 'memberships' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
+                <div className="space-y-6">
+                  {/* Top Bar Actions */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-200 shadow-sm">
                     <div>
-                      <h3 className="font-bold text-stone-900 text-sm">
-                        माँ ताप्ती शोध संस्थान मुलताई - सहभागिता / सदस्यता आवेदन
+                      <h3 className="font-serif font-bold text-stone-900 text-base flex items-center gap-2">
+                        <Users className="w-5 h-5 text-amber-700" />
+                        <span>माँ ताप्ती शोध संस्थान मुलताई - सदस्यता एवं सदस्य प्रबंधन</span>
                       </h3>
-                      <p className="text-stone-500 text-[11px]">
-                        कुल जमा आवेदन: {adminMemberships.length}
+                      <p className="text-stone-500 text-xs mt-0.5">
+                        कुल पंजीकृत / आवदेक सदस्य: <strong>{adminMemberships.length}</strong>
                       </p>
                     </div>
 
                     <button
                       onClick={handleDownloadMembershipsCSV}
-                      className="px-3.5 py-1.5 bg-emerald-800 hover:bg-emerald-700 text-emerald-50 rounded-lg font-bold flex items-center gap-1.5 shadow cursor-pointer text-xs"
+                      className="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-emerald-50 rounded-xl font-bold flex items-center gap-2 shadow transition cursor-pointer text-xs"
                     >
-                      <Download className="w-3.5 h-3.5" /> Excel/CSV डाउनलोड
+                      <Download className="w-4 h-4" /> Excel/CSV डाउनलोड
                     </button>
+                  </div>
+
+                  {/* Add New Member Admin Form Card */}
+                  <div className="bg-gradient-to-br from-amber-50/60 via-white to-amber-100/30 p-5 rounded-2xl border border-amber-300 shadow-md space-y-4">
+                    <div className="flex items-center justify-between border-b border-amber-200 pb-3">
+                      <div className="flex items-center gap-2 text-amber-950 font-serif font-bold text-base">
+                        <UserPlus className="w-5 h-5 text-amber-700" />
+                        <span>➕ नया सदस्य पंजीकृत करें (New Member Registration Form)</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-300">
+                        प्रशासनिक प्रविष्टि (Admin Panel)
+                      </span>
+                    </div>
+
+                    {adminMemberSuccess && (
+                      <div className="p-3.5 bg-emerald-100 border border-emerald-300 text-emerald-950 rounded-xl flex items-center gap-2 text-xs font-bold">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        <span>✓ नया सदस्य सफलतापूर्वक पंजीकृत कर सूची में जोड़ दिया गया!</span>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleAdminAddMember} className="space-y-3.5 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            सदस्य का पूरा नाम <span className="text-red-600">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={adminNewMemberForm.name}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, name: e.target.value})}
+                            placeholder="उदा. राजेश बारंगे पंवार"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            पिता / पति का नाम
+                          </label>
+                          <input
+                            type="text"
+                            value={adminNewMemberForm.fatherName}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, fatherName: e.target.value})}
+                            placeholder="उदा. श्री रामेश्वर पवार"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            मोबाइल / व्हाट्सएप नंबर <span className="text-red-600">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            value={adminNewMemberForm.phone}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, phone: e.target.value})}
+                            placeholder="उदा. 98260XXXXX"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            ईमेल ID
+                          </label>
+                          <input
+                            type="email"
+                            value={adminNewMemberForm.email}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, email: e.target.value})}
+                            placeholder="उदा. example@gmail.com"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            जिला / अंचल <span className="text-red-600">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={adminNewMemberForm.district}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, district: e.target.value})}
+                            placeholder="उदा. बैतूल"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            तहसील / ग्राम / नगर
+                          </label>
+                          <input
+                            type="text"
+                            value={adminNewMemberForm.village}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, village: e.target.value})}
+                            placeholder="उदा. मुलताई"
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            सदस्यता श्रेणी (Membership Type)
+                          </label>
+                          <select
+                            value={adminNewMemberForm.membershipType}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, membershipType: e.target.value})}
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          >
+                            <option value="आजीवन सदस्य (Life Member)">आजीवन सदस्य (Life Member)</option>
+                            <option value="शोधार्थी सदस्य (Research Scholar)">शोधार्थी सदस्य (Research Scholar)</option>
+                            <option value="संरक्षक सदस्य (Patron Member)">संरक्षक सदस्य (Patron Member)</option>
+                            <option value="साधारण सदस्य (General Member)">साधारण सदस्य (General Member)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            पँवारी भाषा ज्ञान
+                          </label>
+                          <select
+                            value={adminNewMemberForm.knowsPawari}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, knowsPawari: e.target.value})}
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          >
+                            <option value="हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं">हाँ, मातृभाषा के रूप में धाराप्रवाह जानते हैं</option>
+                            <option value="हाँ, थोड़ा-बहुत जानते/समझते हैं">हाँ, थोड़ा-बहुत जानते एवं समझते हैं</option>
+                            <option value="नहीं, लेकिन सीखना चाहते हैं">नहीं, लेकिन पँवारी सीखना एवं समझना चाहते हैं</option>
+                            <option value="अन्य शोधार्थी / भाषाप्रेमी">अन्य (शोधार्थी / संस्कृति प्रेमी)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">
+                            विशेष विवरण / टिप्पणियाँ
+                          </label>
+                          <input
+                            type="text"
+                            value={adminNewMemberForm.otherDetails}
+                            onChange={(e) => setAdminNewMemberForm({...adminNewMemberForm, otherDetails: e.target.value})}
+                            placeholder="संस्थान में दायित्व या विशेष विवरण..."
+                            className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pt-1">
+                        <button
+                          type="submit"
+                          className="px-6 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 hover:to-amber-700 text-amber-50 font-bold rounded-xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer"
+                        >
+                          <UserPlus className="w-4 h-4" />
+                          <span>सदस्य पंजीकृत करें (Save New Member)</span>
+                        </button>
+                      </div>
+                    </form>
                   </div>
 
                   {adminMemberships.length === 0 ? (
@@ -3264,9 +4514,9 @@ export default function App() {
                               <td className="p-3 text-[11px] text-stone-500 whitespace-nowrap">{m.date}</td>
                               <td className="p-3 text-right">
                                 <button
-                                  onClick={() => handleDeleteMembership(m.id)}
+                                  onClick={() => handleDeleteMembership(m.id, m.name)}
                                   className="p-1 text-stone-400 hover:text-rose-600 transition cursor-pointer"
-                                  title="आवेदन बताएं"
+                                  title="आवेदन हटाएं"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -3329,9 +4579,9 @@ export default function App() {
                               <td className="p-3 text-[11px] text-stone-500 whitespace-nowrap">{s.date}</td>
                               <td className="p-3 text-right">
                                 <button
-                                  onClick={() => handleDeleteSuggestion(s.id)}
+                                  onClick={() => handleDeleteSuggestion(s.id, s.name)}
                                   className="p-1 text-stone-400 hover:text-rose-600 transition cursor-pointer"
-                                  title="सुझाव बताएं"
+                                  title="सुझाव हटाएं"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -3389,7 +4639,7 @@ export default function App() {
                         </thead>
                         <tbody className="divide-y divide-stone-200 bg-white text-stone-800 font-medium">
                           {adminPendingWords.map((w, idx) => (
-                            <tr key={w.id} className="hover:bg-amber-50/50 transition">
+                            <tr key={`pending_${w.id || idx}_${idx}`} className="hover:bg-amber-50/50 transition">
                               <td className="p-3 font-mono text-stone-500 text-[11px]">{idx + 1}</td>
                               <td className="p-3 font-bold text-amber-950 text-sm">{w.pawari}</td>
                               <td className="p-3 font-semibold text-stone-900">{w.hi_meaning}</td>
@@ -3450,31 +4700,31 @@ export default function App() {
               {/* TAB 5: NEWS & ANNOUNCEMENTS MANAGER */}
               {adminTab === 'news' && (
                 <div className="space-y-6">
-                  <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                    <h3 className="font-bold text-amber-950 text-sm flex items-center gap-2">
-                      <Newspaper className="w-4 h-4 text-amber-700" />
-                      समाचार व घोषणाएं पोस्ट करें (Post News / Announcement)
-                    </h3>
-                    <p className="text-stone-600 text-[11px]">
-                      यहाँ से जोड़ा गया समाचार मुख्य पृष्ठ एवं 'समाचार व घोषणाएं' टैब पर तुरंत दिखाई देगा।
-                    </p>
-
-                    {newsSuccess && (
-                      <div className="mt-2 p-2 bg-emerald-100 text-emerald-900 rounded-lg text-xs font-bold border border-emerald-300">
-                        ✓ समाचार सफलतापूर्वक प्रकाशित कर दिया गया!
+                  {/* EDIT OR CREATE FORM */}
+                  {editingNewsItem ? (
+                    <form onSubmit={handleSaveNewsItemEdit} className="bg-amber-50 p-4 rounded-xl border-2 border-amber-400 space-y-3 shadow-md">
+                      <div className="flex items-center justify-between border-b border-amber-200 pb-2">
+                        <h3 className="font-bold text-amber-950 text-xs sm:text-sm flex items-center gap-2">
+                          <Edit3 className="w-4 h-4 text-amber-800" />
+                          समाचार व घोषणा संपादित करें (Edit News / Announcement)
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setEditingNewsItem(null)}
+                          className="px-2.5 py-1 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-lg text-xs cursor-pointer"
+                        >
+                          ✕ रद्द करें
+                        </button>
                       </div>
-                    )}
 
-                    <form onSubmit={handleAddNewsSubmit} className="mt-3 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block font-bold text-stone-800 mb-1">शीर्षक (Title) *</label>
                           <input
                             type="text"
                             required
-                            value={newNewsForm.title}
-                            onChange={(e) => setNewNewsForm({...newNewsForm, title: e.target.value})}
-                            placeholder="उदा. पँवारी शब्दकोश का नया संस्करण जारी..."
+                            value={editingNewsItem.title}
+                            onChange={(e) => setEditingNewsItem({...editingNewsItem, title: e.target.value})}
                             className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
                           />
                         </div>
@@ -3482,8 +4732,8 @@ export default function App() {
                         <div>
                           <label className="block font-bold text-stone-800 mb-1">श्रेणी (Category)</label>
                           <select
-                            value={newNewsForm.category}
-                            onChange={(e) => setNewNewsForm({...newNewsForm, category: e.target.value as NewsItem['category']})}
+                            value={editingNewsItem.category}
+                            onChange={(e) => setEditingNewsItem({...editingNewsItem, category: e.target.value as NewsItem['category']})}
                             className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-semibold"
                           >
                             <option value="समाचार">📰 समाचार</option>
@@ -3499,9 +4749,8 @@ export default function App() {
                         <textarea
                           required
                           rows={3}
-                          value={newNewsForm.content}
-                          onChange={(e) => setNewNewsForm({...newNewsForm, content: e.target.value})}
-                          placeholder="विस्तृत विवरण लिखें..."
+                          value={editingNewsItem.content}
+                          onChange={(e) => setEditingNewsItem({...editingNewsItem, content: e.target.value})}
                           className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
                         />
                       </div>
@@ -3512,9 +4761,8 @@ export default function App() {
                             <label className="block font-bold text-stone-800 mb-1">लेखक / संस्था</label>
                             <input
                               type="text"
-                              value={newNewsForm.author}
-                              onChange={(e) => setNewNewsForm({...newNewsForm, author: e.target.value})}
-                              placeholder="उदा. माँ ताप्ती शोध संस्थान"
+                              value={editingNewsItem.author || ''}
+                              onChange={(e) => setEditingNewsItem({...editingNewsItem, author: e.target.value})}
                               className="p-2 bg-white border border-stone-300 rounded-lg text-xs w-48"
                             />
                           </div>
@@ -3522,30 +4770,129 @@ export default function App() {
                           <label className="flex items-center gap-2 font-bold text-stone-800 cursor-pointer mt-5">
                             <input
                               type="checkbox"
-                              checked={newNewsForm.isImportant}
-                              onChange={(e) => setNewNewsForm({...newNewsForm, isImportant: e.target.checked})}
+                              checked={editingNewsItem.isImportant}
+                              onChange={(e) => setEditingNewsItem({...editingNewsItem, isImportant: e.target.checked})}
                               className="w-4 h-4 text-amber-600 rounded"
                             />
                             <span>विशेष हाइलाइट (Highlight)</span>
                           </label>
                         </div>
 
-                        <button
-                          type="submit"
-                          className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-xl shadow cursor-pointer self-end"
-                        >
-                          ➕ प्रकाशित करें (Publish News)
-                        </button>
+                        <div className="flex items-center gap-2 self-end">
+                          <button
+                            type="button"
+                            onClick={() => setEditingNewsItem(null)}
+                            className="px-3.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl text-xs cursor-pointer"
+                          >
+                            रद्द करें
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow cursor-pointer"
+                          >
+                            ✓ अपडेट सहेजें (Save Changes)
+                          </button>
+                        </div>
                       </div>
                     </form>
-                  </div>
+                  ) : (
+                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                      <h3 className="font-bold text-amber-950 text-sm flex items-center gap-2">
+                        <Newspaper className="w-4 h-4 text-amber-700" />
+                        समाचार व घोषणाएं पोस्ट करें (Post News / Announcement)
+                      </h3>
+                      <p className="text-stone-600 text-[11px]">
+                        यहाँ से जोड़ा गया समाचार मुख्य पृष्ठ एवं 'समाचार व घोषणाएं' टैब पर तुरंत दिखाई देगा।
+                      </p>
+
+                      {newsSuccess && (
+                        <div className="mt-2 p-2 bg-emerald-100 text-emerald-900 rounded-lg text-xs font-bold border border-emerald-300">
+                          ✓ समाचार सफलतापूर्वक प्रकाशित कर दिया गया!
+                        </div>
+                      )}
+
+                      <form onSubmit={handleAddNewsSubmit} className="mt-3 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block font-bold text-stone-800 mb-1">शीर्षक (Title) *</label>
+                            <input
+                              type="text"
+                              required
+                              value={newNewsForm.title}
+                              onChange={(e) => setNewNewsForm({...newNewsForm, title: e.target.value})}
+                              placeholder="उदा. पँवारी शब्दकोश का नया संस्करण जारी..."
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block font-bold text-stone-800 mb-1">श्रेणी (Category)</label>
+                            <select
+                              value={newNewsForm.category}
+                              onChange={(e) => setNewNewsForm({...newNewsForm, category: e.target.value as NewsItem['category']})}
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-semibold"
+                            >
+                              <option value="समाचार">📰 समाचार</option>
+                              <option value="घोषणा">📢 घोषणा</option>
+                              <option value="कार्यक्रम">📅 कार्यक्रम</option>
+                              <option value="शोध पत्र">📑 शोध पत्र</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-stone-800 mb-1">समाचार विवरण / संदेश *</label>
+                          <textarea
+                            required
+                            rows={3}
+                            value={newNewsForm.content}
+                            onChange={(e) => setNewNewsForm({...newNewsForm, content: e.target.value})}
+                            placeholder="विस्तृत विवरण लिखें..."
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <label className="block font-bold text-stone-800 mb-1">लेखक / संस्था</label>
+                              <input
+                                type="text"
+                                value={newNewsForm.author}
+                                onChange={(e) => setNewNewsForm({...newNewsForm, author: e.target.value})}
+                                placeholder="उदा. माँ ताप्ती शोध संस्थान"
+                                className="p-2 bg-white border border-stone-300 rounded-lg text-xs w-48"
+                              />
+                            </div>
+
+                            <label className="flex items-center gap-2 font-bold text-stone-800 cursor-pointer mt-5">
+                              <input
+                                type="checkbox"
+                                checked={newNewsForm.isImportant}
+                                onChange={(e) => setNewNewsForm({...newNewsForm, isImportant: e.target.checked})}
+                                className="w-4 h-4 text-amber-600 rounded"
+                              />
+                              <span>विशेष हाइलाइट (Highlight)</span>
+                            </label>
+                          </div>
+
+                          <button
+                            type="submit"
+                            className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-xl shadow cursor-pointer self-end"
+                          >
+                            ➕ प्रकाशित करें (Publish News)
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
 
                   {/* Posted News List */}
                   <div className="space-y-3">
                     <h4 className="font-bold text-stone-900 text-xs">वर्तमान में प्रकाशित समाचार ({newsItems.length})</h4>
                     <div className="space-y-2">
-                      {newsItems.map((item) => (
-                        <div key={item.id} className="p-3 bg-white rounded-xl border border-stone-200 shadow-sm flex items-start justify-between gap-3">
+                      {newsItems.map((item, idx) => (
+                        <div key={`news_${item.id || idx}_${idx}`} className="p-3 bg-white rounded-xl border border-stone-200 shadow-sm flex items-start justify-between gap-3">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
@@ -3560,16 +4907,26 @@ export default function App() {
                             </div>
                             <h5 className="font-bold text-stone-900 text-xs">{item.title}</h5>
                             <p className="text-stone-600 text-[11px] line-clamp-2">{item.content}</p>
-                            <div className="text-[10px] text-stone-500 font-semibold">लेखक: {item.author}</div>
                           </div>
 
-                          <button
-                            onClick={() => handleDeleteNewsItem(item.id)}
-                            className="p-1.5 text-stone-400 hover:text-rose-600 transition"
-                            title="समाचार हटाएं"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => setEditingNewsItem(item)}
+                              className="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                              title="समाचार संपादित करें"
+                            >
+                              <Edit3 className="w-3.5 h-3.5 text-amber-800" />
+                              <span>संपादन</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteNewsItem(item.id, item.title)}
+                              className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                              title="समाचार हटाएं"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-rose-700" />
+                              <span>हटाएं</span>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -3577,17 +4934,217 @@ export default function App() {
                 </div>
               )}
 
-              {/* TAB 6: WEBSITE LAYOUT & SITE SETTINGS */}
-              {adminTab === 'layoutSettings' && (
-                <form onSubmit={handleSaveSiteSettings} className="space-y-6">
-                  <div className="flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
+              {/* TAB 6: PAHELIYAN (RIDDLES) CMS MANAGER */}
+              {adminTab === 'paheliyanCms' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-stone-50 p-4 rounded-xl border border-stone-200">
                     <div>
                       <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
-                        <Sliders className="w-4 h-4 text-amber-700" />
-                        वेबसाइट लेआउट व शीर्षक सेटिंग्स (Website Customization)
+                        <HelpCircle className="w-4 h-4 text-amber-700" />
+                        पँवारी पहेलियाँ संपादक CMS (Riddles & Answers CMS)
                       </h3>
                       <p className="text-stone-500 text-[11px]">
-                        वेबसाइट का नाम, सब-टाइटल्स, ऊपर टिकर सूचना पट्टी और सभी सेक्शन को ऑन/ऑफ करें।
+                        कुल पहेलियाँ: <strong>{paheliyanList.length}</strong> • 'फलौदी', 'छिन्न की कहानी' एवं अन्य लोक-पहेलियाँ जोड़ें, संपादित करें या हटाएं।
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={handleResetPaheliyanToDefault}
+                      className="px-3.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border border-stone-300"
+                    >
+                      🔄 डिफ़ॉल्ट 180+ मूल पहेलियों पर रीसेट करें
+                    </button>
+                  </div>
+
+                  {paheliCmsSuccess && (
+                    <div className="p-3 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl font-bold text-xs text-center">
+                      ✓ पहेली डेटा सफलतापूर्वक सहेज दिया गया!
+                    </div>
+                  )}
+
+                  {/* Edit Form if editing */}
+                  {editingPaheli ? (
+                    <form onSubmit={handleSavePaheliEdit} className="p-4 bg-amber-50 rounded-2xl border-2 border-amber-400 space-y-3 shadow-md">
+                      <div className="flex items-center justify-between border-b border-amber-200 pb-2">
+                        <h4 className="font-bold text-amber-950 text-sm">
+                          ✏️ पहेली #{editingPaheli.id} संपादित करें
+                        </h4>
+                        <button type="button" onClick={() => setEditingPaheli(null)} className="text-stone-500 font-bold text-xs">
+                          रद्द करें
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block font-bold text-stone-800 text-xs mb-1">पहेली (Riddle Text) *</label>
+                          <textarea
+                            required
+                            rows={2}
+                            value={editingPaheli.paheli}
+                            onChange={(e) => setEditingPaheli({...editingPaheli, paheli: e.target.value})}
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-serif font-bold"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block font-bold text-stone-800 text-xs mb-1">उत्तर (Answer) *</label>
+                            <input
+                              type="text"
+                              required
+                              value={editingPaheli.answer}
+                              onChange={(e) => setEditingPaheli({...editingPaheli, answer: e.target.value})}
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block font-bold text-stone-800 text-xs mb-1">संकेत (Hint)</label>
+                            <input
+                              type="text"
+                              value={editingPaheli.hint || ''}
+                              onChange={(e) => setEditingPaheli({...editingPaheli, hint: e.target.value})}
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-2 border-t border-amber-200">
+                        <button type="button" onClick={() => setEditingPaheli(null)} className="px-3.5 py-1.5 bg-stone-200 text-stone-800 font-bold text-xs rounded-lg">
+                          रद्द करें
+                        </button>
+                        <button type="submit" className="px-4 py-1.5 bg-amber-800 text-white font-bold text-xs rounded-lg shadow">
+                          ✓ बदलाव सहेजें
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    /* Add New Paheli Form */
+                    <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+                      <h4 className="font-bold text-stone-900 text-xs flex items-center gap-2">
+                        <PlusCircle className="w-4 h-4 text-amber-700" /> नई पहेली जोड़ें (Add New Riddle)
+                      </h4>
+
+                      <form onSubmit={handleAddPaheliSubmit} className="space-y-3">
+                        <div>
+                          <label className="block font-bold text-stone-800 text-xs mb-1">पहेली (Riddle Text) *</label>
+                          <textarea
+                            required
+                            rows={2}
+                            value={newPaheliForm.paheli}
+                            onChange={(e) => setNewPaheliForm({...newPaheliForm, paheli: e.target.value})}
+                            placeholder="उदा. 'छिन्ना की कहानी छिन्ना जाने...' या फलौदी पहेली लिखें..."
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-serif"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block font-bold text-stone-800 text-xs mb-1">उत्तर (Answer) *</label>
+                            <input
+                              type="text"
+                              required
+                              value={newPaheliForm.answer}
+                              onChange={(e) => setNewPaheliForm({...newPaheliForm, answer: e.target.value})}
+                              placeholder="उदा. भुट्टा / कपास / चिड़िया"
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-bold"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block font-bold text-stone-800 text-xs mb-1">संकेत (Hint)</label>
+                            <input
+                              type="text"
+                              value={newPaheliForm.hint}
+                              onChange={(e) => setNewPaheliForm({...newPaheliForm, hint: e.target.value})}
+                              placeholder="उदा. कृषि / प्रकृति / पक्षी"
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow cursor-pointer"
+                        >
+                          ➕ नई पहेली जोड़ें (Save Riddle)
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* Riddles List Table with Search */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="font-bold text-stone-900 text-xs">पहेलियाँ सूची ({paheliyanList.length})</h4>
+                      <input
+                        type="text"
+                        value={paheliSearchCmsTerm}
+                        onChange={(e) => setPaheliSearchCmsTerm(e.target.value)}
+                        placeholder="पहेली या उत्तर खोजें..."
+                        className="px-3 py-1 bg-white border border-stone-300 rounded-lg text-xs w-48 sm:w-64"
+                      />
+                    </div>
+
+                    <div className="max-h-80 overflow-y-auto rounded-xl border border-stone-200 shadow-sm">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-stone-900 text-amber-100 text-[11px] uppercase font-bold tracking-wider">
+                            <th className="p-2.5 border-b border-stone-800"># आईडी</th>
+                            <th className="p-2.5 border-b border-stone-800">पहेली</th>
+                            <th className="p-2.5 border-b border-stone-800">उत्तर</th>
+                            <th className="p-2.5 border-b border-stone-800">संकेत</th>
+                            <th className="p-2.5 border-b border-stone-800 text-right">कार्रवाई</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-stone-200 bg-white text-stone-800 text-xs font-medium">
+                          {paheliyanList
+                            .filter(p => !paheliSearchCmsTerm || p.paheli.includes(paheliSearchCmsTerm) || p.answer.includes(paheliSearchCmsTerm))
+                            .map((item, idx) => (
+                              <tr key={`cms_pah_${item.id || idx}_${idx}`} className="hover:bg-amber-50/40 transition">
+                                <td className="p-2.5 font-mono text-stone-500 font-bold">#{item.id}</td>
+                                <td className="p-2.5 font-serif font-bold text-stone-900 max-w-sm">"{item.paheli}"</td>
+                                <td className="p-2.5 font-bold text-amber-950">{item.answer}</td>
+                                <td className="p-2.5 text-stone-500 text-[11px]">{item.hint || '-'}</td>
+                                <td className="p-2.5 text-right">
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      onClick={() => setEditingPaheli(item)}
+                                      className="px-2.5 py-1 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded-lg text-[11px] cursor-pointer shadow-2xs transition"
+                                    >
+                                      ✏️ संपादन
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeletePaheli(item.id, item.paheli)}
+                                      className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold rounded-lg text-[11px] cursor-pointer shadow-2xs transition flex items-center gap-1 border border-rose-300"
+                                      title="पहेली हटाएं (Delete Riddle)"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5 text-rose-700" />
+                                      <span>हटाएं</span>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 7: SHODH SANSTHAN DETAILS CMS */}
+              {adminTab === 'shodhSansthanCms' && (
+                <form onSubmit={handleSaveShodhSansthanSettings} className="space-y-6">
+                  <div className="flex items-center justify-between gap-3 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div>
+                      <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-amber-700" />
+                        शोध संस्थान एवं संपादकीय विवरण CMS
+                      </h3>
+                      <p className="text-stone-500 text-[11px]">
+                        माँ ताप्ती शोध संस्थान मुलताई एवं सतपुड़ा संस्कृति संस्थान का पता, फोन नंबर, ईमेल व विवरण बदलें।
                       </p>
                     </div>
 
@@ -3595,25 +5152,899 @@ export default function App() {
                       type="submit"
                       className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-xl font-bold flex items-center gap-1.5 shadow cursor-pointer text-xs"
                     >
-                      <Save className="w-4 h-4" /> सहेजें (Save Settings)
+                      <Save className="w-4 h-4" /> संस्थान विवरण सहेजें
+                    </button>
+                  </div>
+
+                  {shodhSansthanSavedSuccess && (
+                    <div className="p-3 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl font-bold text-xs text-center">
+                      ✓ संस्थान विवरण सफलतापूर्वक अपडेट कर दिया गया!
+                    </div>
+                  )}
+
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संस्थान का मुख्य नाम (Institute Title)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.shodhSansthanTitle || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanTitle: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-bold text-amber-950"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">प्रधान संपादक का नाम (Chief Editor)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.shodhSansthanEditor || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanEditor: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-bold text-stone-900"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 text-xs mb-1">संबद्ध संस्थाएं (Parent Organizations)</label>
+                      <input
+                        type="text"
+                        value={siteSettings.shodhSansthanOrg || ''}
+                        onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanOrg: e.target.value})}
+                        className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">स्थान / पता (Address)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.shodhSansthanAddress || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanAddress: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संपर्क फ़ोन नंबर (Phone)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.shodhSansthanPhone || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanPhone: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">आधिकारिक ईमेल (Email)</label>
+                        <input
+                          type="email"
+                          value={siteSettings.shodhSansthanEmail || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanEmail: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-stone-800 text-xs mb-1">संस्थान का उद्देश्य व परिचय (Institute Description)</label>
+                      <textarea
+                        rows={3}
+                        value={siteSettings.shodhSansthanDescription || ''}
+                        onChange={(e) => setSiteSettings({...siteSettings, shodhSansthanDescription: e.target.value})}
+                        className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs"
+                      />
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {/* TAB 8: SANSTHAN PATRIKA (JOURNAL) CMS */}
+              {adminTab === 'patrikaCms' && (
+                <div className="space-y-6">
+                  {patrikaCmsSuccess && (
+                    <div className="p-3 bg-emerald-100 border border-emerald-400 text-emerald-950 rounded-xl text-xs font-bold flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                      <span>पत्रिका विवरण एवं शोध आलेख सफलतापूर्वक सुरक्षित (Saved) कर दिए गए हैं!</span>
+                    </div>
+                  )}
+
+                  {/* Section 1: Master Patrika Details & Settings */}
+                  <form onSubmit={handleSaveSiteSettings} className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-4">
+                    <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+                      <div>
+                        <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-amber-700" />
+                          1. पँवारी शोध पत्रिका - मूल विवरण (Master Patrika Details)
+                        </h3>
+                        <p className="text-stone-500 text-[11px]">
+                          पत्रिका का नाम, विशेषांक अंक, प्रधान संपादक, सलाहकार मंडल, ISSN/पंजीयन क्रमांक व ई-पत्रिका PDF लिंक बदलें।
+                        </p>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-xl text-xs font-bold shadow transition flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>सुरक्षित करें (Save Master Details)</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">पत्रिका का नाम (Journal Title)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaTitle || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaTitle: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          placeholder="पँवारी शोध पत्रिका (Pawari Research Journal)"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">वर्ष एवं विशेषांक अंक (Volume / Issue Details)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaVolume || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaVolume: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          placeholder="वर्ष 12, अंक 4 (सतपुड़ा संस्कृति व भाषा विशेषांक)"
+                        />
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          <span className="text-[10px] text-stone-500 font-bold self-center">त्वरित चयन:</span>
+                          {[
+                            'वर्ष 12, अंक 4 (2026)',
+                            'वर्ष 12, अंक 3 (2026)',
+                            'वर्ष 11, अंक 4 (2025)',
+                            'सतपुड़ा संस्कृति व भाषा विशेषांक',
+                            'लोक-साहित्य व लोक-गीत विशेषांक',
+                            'वार्षिक विशेषांक 2026'
+                          ].map((pVal) => (
+                            <button
+                              key={pVal}
+                              type="button"
+                              onClick={() => setSiteSettings({...siteSettings, patrikaVolume: pVal})}
+                              className="px-2 py-0.5 bg-amber-100/80 hover:bg-amber-200 text-amber-900 rounded text-[10px] font-bold border border-amber-300/80 transition cursor-pointer"
+                            >
+                              + {pVal}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">प्रधान संपादक (Chief Editors)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaChiefEditor || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaChiefEditor: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          placeholder="वल्लभ डोंगरे & रूपेश पवार"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संपादकीय व सलाहकार मंडल (Editorial Board)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaEditorialBoard || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaEditorialBoard: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          placeholder="डॉ. रामेश्वर पवार, प्रो. हरिशंकर ठाकरे, इंजी. अमर पवार, राजेश बारंगे पंवार"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">पंजीयन / ISSN क्रमांक (Registration Number)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaRegistration || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaRegistration: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          placeholder="पंजीयन क्र. MP/PAWARI/PATRIKA/2026/12"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">ई-पत्रिका कवर फोटो URL (Cover Image URL)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaCoverUrl || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaCoverUrl: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          placeholder="https://images.unsplash.com/..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संपूर्ण ई-पत्रिका PDF डाउनलोड लिंक (Full PDF Link)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.patrikaPdfUrl || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaPdfUrl: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          placeholder="https://example.com/pawari-patrika.pdf"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संपर्क ईमेल (Contact Email)</label>
+                        <input
+                          type="email"
+                          value={siteSettings.patrikaContactEmail || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaContactEmail: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          placeholder="rupeshpawar10@gmail.com"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block font-bold text-stone-800 text-xs mb-1">पत्रिका परिचय एवं उद्देश्य (Patrika Overview / Description)</label>
+                        <textarea
+                          rows={2}
+                          value={siteSettings.patrikaDescription || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaDescription: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          placeholder="सतपुड़ा अंचल की प्राचीन पँवारी (भोयरी) बोली, लोक-साहित्य, इतिहास एवं धरोहर के प्रलेखीकरण तथा शोध हेतु..."
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block font-bold text-stone-800 text-xs mb-1">रचनाकारों हेतु दिशा-निर्देश (Submission Guidelines for Authors)</label>
+                        <textarea
+                          rows={3}
+                          value={siteSettings.patrikaSubmissionGuidelines || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, patrikaSubmissionGuidelines: e.target.value})}
+                          className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                  </form>
+
+                  {/* Section 2: Published Research Articles Management (Full CRUD) */}
+                  <div className="bg-white p-5 rounded-2xl border border-stone-200 space-y-4 shadow-sm">
+                    <div className="flex items-center justify-between border-b border-stone-200 pb-3">
+                      <div>
+                        <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-amber-700" />
+                          2. प्रकाशित शोध आलेख व रचनाएँ (Articles CMS) ({patrikaArticles.length})
+                        </h3>
+                        <p className="text-stone-500 text-[11px]">
+                          शोध पत्रिका में नए शोध आलेख जोड़ें, संपादित करें या हटाएं।
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Add / Edit Article Form */}
+                    <form onSubmit={editingPatrikaArticle ? handleSavePatrikaArticleEdit : handleAddPatrikaArticle} className="bg-amber-50/60 p-4 rounded-xl border border-amber-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-900 flex items-center gap-1">
+                          {editingPatrikaArticle ? '✏️ शोध आलेख संपादित करें' : '➕ नया शोध आलेख जोड़ें'}
+                        </span>
+                        {editingPatrikaArticle && (
+                          <button
+                            type="button"
+                            onClick={() => setEditingPatrikaArticle(null)}
+                            className="text-xs text-stone-500 hover:text-stone-800 underline"
+                          >
+                            रद्द करें
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="sm:col-span-2">
+                          <label className="block text-[11px] font-bold text-stone-700">आलेख शीर्षक (Article Title) *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingPatrikaArticle ? editingPatrikaArticle.title : newPatrikaArticleForm.title}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, title: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, title: e.target.value})}
+                            placeholder="जैसे: पँवारी (भोयरी) बोली की उत्पत्ति एवं सतपुड़ा अंचल की भाषिक धरोहर"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">लेखक / शोधार्थी का नाम (Author) *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingPatrikaArticle ? editingPatrikaArticle.author : newPatrikaArticleForm.author}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, author: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, author: e.target.value})}
+                            placeholder="लेखक का नाम"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">विषय श्रेणी (Category)</label>
+                          <select
+                            value={editingPatrikaArticle ? editingPatrikaArticle.category : newPatrikaArticleForm.category}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, category: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, category: e.target.value})}
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-medium"
+                          >
+                            <option value="भाषा व व्याकरण शोध">भाषा व व्याकरण शोध</option>
+                            <option value="इतिहास एवं लोक-संस्कृति">इतिहास एवं लोक-संस्कृति</option>
+                            <option value="लोक-साहित्य">लोक-साहित्य</option>
+                            <option value="लोक-संगीत">लोक-संगीत</option>
+                            <option value="विशेषांक / पत्रिका अंक">विशेषांक / पत्रिका अंक</option>
+                            <option value="लोक-कथा एवं पहेलियाँ">लोक-कथा एवं पहेलियाँ</option>
+                            <option value="शब्दकोश व शब्दावली शोध">शब्दकोश व शब्दावली शोध</option>
+                            <option value="समीक्षा व परिचर्चा">समीक्षा व परिचर्चा</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">प्रकाशन माह, वर्ष व अंक (Period / Issue / Date)</label>
+                          <div className="flex gap-1.5">
+                            <input
+                              type="text"
+                              value={editingPatrikaArticle ? editingPatrikaArticle.date : newPatrikaArticleForm.date}
+                              onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, date: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, date: e.target.value})}
+                              placeholder="उदा. अगस्त 2026 / वर्ष 12 अंक 4"
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                            />
+                            <select
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const selectedVal = e.target.value;
+                                  if (editingPatrikaArticle) {
+                                    setEditingPatrikaArticle({...editingPatrikaArticle, date: selectedVal});
+                                  } else {
+                                    setNewPatrikaArticleForm({...newPatrikaArticleForm, date: selectedVal});
+                                  }
+                                }
+                              }}
+                              className="p-2 bg-amber-50 border border-amber-300 rounded-lg text-xs font-bold text-amber-950 cursor-pointer shrink-0"
+                              title="अवधि या वर्ष चुनें"
+                            >
+                              <option value="">➕ अवधि चुनें</option>
+                              <option value="अगस्त 2026 (वर्ष 12 अंक 4)">अगस्त 2026 (वर्ष 12 अंक 4)</option>
+                              <option value="मई 2026 (वर्ष 12 अंक 3)">मई 2026 (वर्ष 12 अंक 3)</option>
+                              <option value="फरवरी 2026 (वर्ष 12 अंक 2)">फरवरी 2026 (वर्ष 12 अंक 2)</option>
+                              <option value="जनवरी 2026 (वर्ष 12 अंक 1)">जनवरी 2026 (वर्ष 12 अंक 1)</option>
+                              <option value="वर्ष 2025 (विशेषांक अंक)">वर्ष 2025 (विशेषांक अंक)</option>
+                              <option value="वर्ष 2024 (वार्षिक विशेषांक)">वर्ष 2024 (वार्षिक विशेषांक)</option>
+                              <option value="ऐतिहासिक धरोहर अंक">ऐतिहासिक धरोहर अंक</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">PDF डाउनलोड लिंक (PDF URL)</label>
+                          <input
+                            type="text"
+                            value={editingPatrikaArticle ? (editingPatrikaArticle.pdfUrl || '') : newPatrikaArticleForm.pdfUrl}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, pdfUrl: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, pdfUrl: e.target.value})}
+                            placeholder="https://example.com/article.pdf"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">वेब/आर्टिकल ऑनलाइन लिंक (Article URL)</label>
+                          <input
+                            type="text"
+                            value={editingPatrikaArticle ? (editingPatrikaArticle.articleUrl || '') : newPatrikaArticleForm.articleUrl}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, articleUrl: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, articleUrl: e.target.value})}
+                            placeholder="https://example.com/article"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-[11px] font-bold text-stone-700">आलेख सार (Summary / Abstract) *</label>
+                          <textarea
+                            rows={3}
+                            required
+                            value={editingPatrikaArticle ? editingPatrikaArticle.summary : newPatrikaArticleForm.summary}
+                            onChange={(e) => editingPatrikaArticle ? setEditingPatrikaArticle({...editingPatrikaArticle, summary: e.target.value}) : setNewPatrikaArticleForm({...newPatrikaArticleForm, summary: e.target.value})}
+                            placeholder="आलेख का संक्षिप्त विवरण एवं मुख्य शोध निष्कर्ष..."
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow transition cursor-pointer flex items-center gap-1.5"
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>{editingPatrikaArticle ? 'आलेख अपडेट करें' : 'नया शोध आलेख जोड़ें'}</span>
+                      </button>
+                    </form>
+
+                    {/* Articles Table */}
+                    <div className="overflow-x-auto border border-stone-200 rounded-xl">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-stone-100 border-b border-stone-200 text-stone-700 font-bold">
+                            <th className="p-2.5">शीर्षक & श्रेणी</th>
+                            <th className="p-2.5">लेखक</th>
+                            <th className="p-2.5">दिनांक</th>
+                            <th className="p-2.5 text-right">कार्रवाई</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-stone-200">
+                          {patrikaArticles.map((art) => (
+                            <tr key={art.id} className="hover:bg-amber-50/50">
+                              <td className="p-2.5">
+                                <p className="font-bold text-stone-900">{art.title}</p>
+                                <span className="text-[10px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded border border-amber-300">
+                                  {art.category}
+                                </span>
+                              </td>
+                              <td className="p-2.5 text-stone-700 font-medium">{art.author}</td>
+                              <td className="p-2.5 text-stone-500 text-[11px]">{art.date}</td>
+                              <td className="p-2.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => setEditingPatrikaArticle(art)}
+                                    className="px-2 py-1 bg-amber-800 text-white font-bold rounded text-[11px] cursor-pointer"
+                                  >
+                                    ✏️ संपादन
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeletePatrikaArticle(art.id, art.title)}
+                                    className="p-1 text-stone-400 hover:text-rose-600 transition cursor-pointer"
+                                    title="आलेख हटाएं"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Sansthan Officials & Board Management (Add, Edit, Delete, Time Periods) */}
+                  <div className="bg-white p-5 rounded-2xl border border-stone-200 space-y-5 shadow-sm">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-stone-200 pb-3 gap-2">
+                      <div>
+                        <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                          <Users className="w-4 h-4 text-amber-700" />
+                          3. माँ ताप्ती शोध संस्थान - पदाधिकारी व मंडल प्रबन्धन ({sansthanOfficials.length})
+                        </h3>
+                        <p className="text-stone-500 text-[11px]">
+                          संस्थान के सभी पदाधिकारियों/सदस्यों का विवरण जोड़ें, संपादित करें, बनाएं एवं कार्यकाल (Time Period) निर्धारित करें।
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleResetSansthanOfficialsToDefault}
+                        className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold border border-stone-300 cursor-pointer flex items-center gap-1 shrink-0"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 text-stone-500" />
+                        <span>मूल सूची रीसेट करें</span>
+                      </button>
+                    </div>
+
+                    {/* Time Period Management Card (Add, Edit, Delete Time Periods) */}
+                    <div className="bg-amber-50/80 p-4 rounded-xl border border-amber-300/80 space-y-3 shadow-2xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-200 pb-2">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-amber-800 shrink-0" />
+                          <h4 className="font-bold text-amber-950 text-xs sm:text-sm">
+                            कार्यकालावधि / समय अवधि (Time Period) प्रबन्धन ({managedTimePeriods.length})
+                          </h4>
+                        </div>
+                        <span className="text-[11px] text-amber-900 font-medium">
+                          पदाधिकारियों के लिए कार्यकाल जोड़ें, नाम बदलें या हटाएं
+                        </span>
+                      </div>
+
+                      {/* Add Time Period Form */}
+                      <form onSubmit={handleAddTimePeriod} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <input
+                          type="text"
+                          value={newTimePeriodInput}
+                          onChange={(e) => setNewTimePeriodInput(e.target.value)}
+                          placeholder="नया कार्यकाल दर्ज करें (जैसे: 2024 - 2028, या 2012 - 2016)"
+                          className="flex-1 p-2 bg-white border border-stone-300 rounded-lg text-xs font-bold text-amber-950 placeholder:font-normal placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        />
+                        <button
+                          type="submit"
+                          className="px-3.5 py-2 bg-amber-800 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer shrink-0 flex items-center justify-center gap-1"
+                        >
+                          <PlusCircle className="w-3.5 h-3.5" />
+                          <span>नया कार्यकाल जोड़ें</span>
+                        </button>
+                      </form>
+
+                      {/* Edit Time Period Inline Modal / Form */}
+                      {editingTimePeriodObj && (
+                        <form onSubmit={handleSaveTimePeriodRename} className="p-3 bg-white rounded-xl border-2 border-amber-500 space-y-2 animate-in fade-in duration-150">
+                          <div className="flex items-center justify-between text-xs font-bold text-amber-900">
+                            <span>✏️ कार्यकाल "{editingTimePeriodObj.oldName}" का नाम संपादित करें:</span>
+                            <button
+                              type="button"
+                              onClick={() => setEditingTimePeriodObj(null)}
+                              className="text-stone-500 hover:text-stone-800 underline text-[11px] cursor-pointer"
+                            >
+                              रद्द करें
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              required
+                              value={editingTimePeriodObj.newName}
+                              onChange={(e) => setEditingTimePeriodObj({ ...editingTimePeriodObj, newName: e.target.value })}
+                              className="flex-1 p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-bold text-amber-900"
+                            />
+                            <button
+                              type="submit"
+                              className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs"
+                            >
+                              अपडेट करें
+                            </button>
+                          </div>
+                          <p className="text-[10px] text-stone-500 font-medium">
+                            * इस कार्यकाल को बदलने से इस अवधि के सभी पदाधिकारियों का कार्यकाल अपने-आप नए नाम में बदल जाएगा।
+                          </p>
+                        </form>
+                      )}
+
+                      {/* Time Periods List Badges */}
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {managedTimePeriods.map((period) => {
+                          const count = sansthanOfficials.filter(o => o.timePeriod === period).length;
+                          return (
+                            <div
+                              key={period}
+                              className="px-2.5 py-1.5 bg-white border border-amber-300 hover:border-amber-500 rounded-xl flex items-center gap-2 shadow-2xs transition text-xs"
+                            >
+                              <span className="font-bold text-amber-950 flex items-center gap-1">
+                                <Calendar className="w-3.5 h-3.5 text-amber-700" />
+                                {period}
+                              </span>
+
+                              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 text-[10px] font-bold rounded-md border border-amber-200">
+                                {count} सदस्य
+                              </span>
+
+                              <div className="flex items-center gap-1 border-l border-stone-200 pl-1.5 ml-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingTimePeriodObj({ oldName: period, newName: period })}
+                                  className="p-1 hover:bg-amber-100 text-stone-600 hover:text-amber-900 rounded transition cursor-pointer"
+                                  title="कार्यकाल नाम बदलें (Edit Time Period)"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTimePeriod(period)}
+                                  className="p-1 hover:bg-rose-100 text-stone-400 hover:text-rose-700 rounded transition cursor-pointer"
+                                  title="कार्यकाल हटाएं (Delete Time Period)"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Form for Add/Edit Official */}
+                    <form onSubmit={editingSansthanOfficial ? handleSaveSansthanOfficialEdit : handleAddSansthanOfficial} className="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-900 flex items-center gap-1">
+                          {editingSansthanOfficial ? `✏️ पदाधिकारी "${editingSansthanOfficial.name}" संपादित करें` : '➕ नया पदाधिकारी / मंडल सदस्य जोड़ें'}
+                        </span>
+                        {editingSansthanOfficial && (
+                          <button
+                            type="button"
+                            onClick={() => setEditingSansthanOfficial(null)}
+                            className="text-xs text-stone-500 hover:text-stone-800 underline cursor-pointer"
+                          >
+                            रद्द करें
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">पूरा नाम (Full Name) *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingSansthanOfficial ? editingSansthanOfficial.name : newSansthanOfficialForm.name}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, name: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, name: e.target.value})}
+                            placeholder="जैसे: रूपेश पवार"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">पदनाम / जिम्मेदारी (Designation) *</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingSansthanOfficial ? editingSansthanOfficial.designation : newSansthanOfficialForm.designation}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, designation: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, designation: e.target.value})}
+                            placeholder="जैसे: प्रधान संपादक व सचिव"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-amber-950 flex items-center gap-1 mb-1">
+                            <Clock className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+                            <span>कार्यकाल / समय अवधि (Time Period) *</span>
+                          </label>
+                          <div className="space-y-1.5">
+                            <select
+                              value={editingSansthanOfficial ? editingSansthanOfficial.timePeriod : newSansthanOfficialForm.timePeriod}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (editingSansthanOfficial) {
+                                  setEditingSansthanOfficial({...editingSansthanOfficial, timePeriod: val});
+                                } else {
+                                  setNewSansthanOfficialForm({...newSansthanOfficialForm, timePeriod: val});
+                                }
+                              }}
+                              className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-amber-950 focus:ring-1 focus:ring-amber-500 shadow-2xs cursor-pointer"
+                            >
+                              <option value="">-- समय अवधि चुनें (Select Time Period) --</option>
+                              {managedTimePeriods.map(p => (
+                                <option key={p} value={p}>📅 {p}</option>
+                              ))}
+                              {((editingSansthanOfficial && editingSansthanOfficial.timePeriod && !managedTimePeriods.includes(editingSansthanOfficial.timePeriod)) ||
+                                (!editingSansthanOfficial && newSansthanOfficialForm.timePeriod && !managedTimePeriods.includes(newSansthanOfficialForm.timePeriod))) && (
+                                <option value={editingSansthanOfficial ? editingSansthanOfficial.timePeriod : newSansthanOfficialForm.timePeriod}>
+                                  ✏️ {editingSansthanOfficial ? editingSansthanOfficial.timePeriod : newSansthanOfficialForm.timePeriod}
+                                </option>
+                              )}
+                            </select>
+
+                            {/* Quick select buttons for time periods */}
+                            <div className="flex flex-wrap gap-1">
+                              {managedTimePeriods.map(period => (
+                                <button
+                                  type="button"
+                                  key={period}
+                                  onClick={() => {
+                                    if (editingSansthanOfficial) {
+                                      setEditingSansthanOfficial({...editingSansthanOfficial, timePeriod: period});
+                                    } else {
+                                      setNewSansthanOfficialForm({...newSansthanOfficialForm, timePeriod: period});
+                                    }
+                                  }}
+                                  className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition flex items-center gap-1 border ${
+                                    (editingSansthanOfficial ? editingSansthanOfficial.timePeriod : newSansthanOfficialForm.timePeriod) === period
+                                      ? 'bg-amber-800 text-white border-amber-800 shadow-2xs'
+                                      : 'bg-white text-stone-700 border-stone-300 hover:bg-amber-100 hover:border-amber-400'
+                                  }`}
+                                >
+                                  <Calendar className="w-3 h-3 text-amber-700 shrink-0" />
+                                  <span>{period}</span>
+                                </button>
+                              ))}
+                            </div>
+
+                            <input
+                              type="text"
+                              required
+                              value={editingSansthanOfficial ? editingSansthanOfficial.timePeriod : newSansthanOfficialForm.timePeriod}
+                              onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, timePeriod: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, timePeriod: e.target.value})}
+                              placeholder="या कस्टम समय अवधि दर्ज करें..."
+                              className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-bold text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">स्थान / शहर (Location)</label>
+                          <input
+                            type="text"
+                            value={editingSansthanOfficial ? (editingSansthanOfficial.location || '') : newSansthanOfficialForm.location}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, location: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, location: e.target.value})}
+                            placeholder="मुलताई (बैतूल)"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">दूरभाष / मोबाइल (Phone)</label>
+                          <input
+                            type="text"
+                            value={editingSansthanOfficial ? (editingSansthanOfficial.phone || '') : newSansthanOfficialForm.phone}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, phone: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, phone: e.target.value})}
+                            placeholder="+91-9425000000"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-stone-700">ईमेल (Email)</label>
+                          <input
+                            type="email"
+                            value={editingSansthanOfficial ? (editingSansthanOfficial.email || '') : newSansthanOfficialForm.email}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, email: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, email: e.target.value})}
+                            placeholder="email@example.com"
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs font-mono"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-3">
+                          <label className="block text-[11px] font-bold text-stone-700">परिचय व योगदान (Bio / Contribution)</label>
+                          <textarea
+                            rows={2}
+                            value={editingSansthanOfficial ? (editingSansthanOfficial.bio || '') : newSansthanOfficialForm.bio}
+                            onChange={(e) => editingSansthanOfficial ? setEditingSansthanOfficial({...editingSansthanOfficial, bio: e.target.value}) : setNewSansthanOfficialForm({...newSansthanOfficialForm, bio: e.target.value})}
+                            placeholder="पँवारी भाषा व लोक-संस्कृति प्रलेखीकरण में योगदान..."
+                            className="w-full p-2 bg-white border border-stone-300 rounded-lg text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow transition cursor-pointer flex items-center gap-1.5"
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>{editingSansthanOfficial ? 'पदाधिकारी विवरण अपडेट करें' : 'नया पदाधिकारी जोड़ें'}</span>
+                      </button>
+                    </form>
+
+                    {/* Officials Table */}
+                    <div className="overflow-x-auto border border-stone-200 rounded-xl">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-stone-100 border-b border-stone-200 text-stone-700 font-bold">
+                            <th className="p-2.5">नाम & पदनाम</th>
+                            <th className="p-2.5">कार्यकाल (Time Period)</th>
+                            <th className="p-2.5">स्थान & संपर्क</th>
+                            <th className="p-2.5 text-right">कार्रवाई</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-stone-200">
+                          {sansthanOfficials.map((off) => (
+                            <tr key={off.id} className="hover:bg-amber-50/50">
+                              <td className="p-2.5">
+                                <p className="font-bold text-stone-900">{off.name}</p>
+                                <p className="text-[11px] text-stone-600 font-medium">{off.designation}</p>
+                              </td>
+                              <td className="p-2.5">
+                                <span className="px-2 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 rounded text-[11px] font-bold">
+                                  {off.timePeriod}
+                                </span>
+                              </td>
+                              <td className="p-2.5 text-stone-600 text-[11px]">
+                                <p>{off.location}</p>
+                                <p className="font-mono text-stone-500">{off.phone}</p>
+                              </td>
+                              <td className="p-2.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => setEditingSansthanOfficial(off)}
+                                    className="px-2 py-1 bg-amber-800 text-white font-bold rounded text-[11px] cursor-pointer"
+                                  >
+                                    ✏️ संपादन
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteSansthanOfficial(off.id, off.name)}
+                                    className="px-2 py-1 bg-rose-700 text-white font-bold rounded text-[11px] cursor-pointer"
+                                  >
+                                    🗑️ हटाएं
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 8: WEBSITE LAYOUT & SITE SETTINGS (THEME & TOGGLES CMS) */}
+              {adminTab === 'layoutSettings' && (
+                <form onSubmit={handleSaveSiteSettings} className="space-y-6">
+                  <div className="flex items-center justify-between gap-3 bg-stone-50 p-4 rounded-xl border border-stone-200">
+                    <div>
+                      <h3 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                        <Sliders className="w-4 h-4 text-amber-700" />
+                        वेबसाइट लेआउट, थीम, फोंट व दृश्यता CMS (Full Control CMS)
+                      </h3>
+                      <p className="text-stone-500 text-[11px]">
+                        यहाँ से वेबसाइट का रंग थीम, फ़ॉन्ट, हेडर, फूटर संदेश व सभी 9 सेक्शन ऑन/ऑफ करें।
+                      </p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-xl font-bold flex items-center gap-1.5 shadow cursor-pointer text-xs"
+                    >
+                      <Save className="w-4 h-4" /> बदलाव सहेजें (Save All)
                     </button>
                   </div>
 
                   {settingsSavedSuccess && (
                     <div className="p-3 bg-emerald-100 text-emerald-950 border border-emerald-300 rounded-xl font-bold text-xs text-center">
-                      ✓ वेबसाइट सेटिंग्स सफलतापूर्व सहेज दी गईं!
+                      ✓ वेबसाइट सेटिंग्स व थीम सफलतापूर्व सहेज दी गईं!
                     </div>
                   )}
 
-                  {/* 1. Header Titles & Taglines */}
-                  <div className="p-4 bg-white rounded-xl border border-stone-200 space-y-3">
+                  {/* 1. Theme Color & Typography Choice */}
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-4">
+                    <h4 className="font-bold text-stone-900 text-xs border-b border-stone-200 pb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-600" />
+                      1. वेबसाइट थीम कलर व फोंट शैली (Theme & Typography Choice)
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-2">रंग थीम चुनें (Color Theme)</label>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'amber', name: '🟧 एम्बर हेरिटेज', bg: 'bg-amber-700 text-white' },
+                            { id: 'emerald', name: '🟩 एमराल्ड नेचर', bg: 'bg-emerald-700 text-white' },
+                            { id: 'indigo', name: '🟦 रॉयल इंडिगो', bg: 'bg-indigo-700 text-white' },
+                            { id: 'rose', name: '🟥 टेराकोटा रेड', bg: 'bg-rose-700 text-white' },
+                            { id: 'slate', name: '⬛ स्लेट मॉडर्न', bg: 'bg-slate-800 text-white' }
+                          ].map(t => (
+                            <button
+                              type="button"
+                              key={t.id}
+                              onClick={() => setSiteSettings({...siteSettings, themeColor: t.id as any})}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border cursor-pointer ${
+                                (siteSettings.themeColor || 'amber') === t.id
+                                  ? `${t.bg} shadow-md border-stone-900 ring-2 ring-stone-900 ring-offset-1`
+                                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200 border-stone-300'
+                              }`}
+                            >
+                              {t.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-2">फोंट शैली (Font Style)</label>
+                        <div className="flex gap-2">
+                          {[
+                            { id: 'serif', name: '📜 पारंपरिक (Serif Classic)' },
+                            { id: 'sans', name: '📱 आधुनिक (Sans Modern)' }
+                          ].map(f => (
+                            <button
+                              type="button"
+                              key={f.id}
+                              onClick={() => setSiteSettings({...siteSettings, fontStyle: f.id as any})}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border cursor-pointer ${
+                                (siteSettings.fontStyle || 'serif') === f.id
+                                  ? 'bg-amber-800 text-white shadow border-amber-900'
+                                  : 'bg-stone-100 text-stone-700 hover:bg-stone-200 border-stone-300'
+                              }`}
+                            >
+                              {f.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Header Titles & Taglines */}
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-3">
                     <h4 className="font-bold text-stone-800 text-xs border-b border-stone-200 pb-2">
-                      1. मुख्य वेबसाइट शीर्षक व सब-टाइटल्स (Branding Titles)
+                      2. मुख्य वेबसाइट शीर्षक व सब-टाइटल्स (Branding Titles)
                     </h4>
 
                     <div className="space-y-3">
                       <div>
-                        <label className="block font-bold text-stone-800 mb-1">मुख्य वेबसाइट शीर्षक (Main Title)</label>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">मुख्य वेबसाइट शीर्षक (Main Title)</label>
                         <input
                           type="text"
                           value={siteSettings.siteTitle}
@@ -3623,7 +6054,7 @@ export default function App() {
                       </div>
 
                       <div>
-                        <label className="block font-bold text-stone-800 mb-1">संस्थान / सब-टाईटल (Sub-Title Line)</label>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">संस्थान / सब-टाईटल (Sub-Title Line)</label>
                         <input
                           type="text"
                           value={siteSettings.siteSubtitle}
@@ -3633,7 +6064,7 @@ export default function App() {
                       </div>
 
                       <div>
-                        <label className="block font-bold text-stone-800 mb-1">हेडर विवरण टैगलाइन (Header Tagline)</label>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">हेडर विवरण टैगलाइन (Header Tagline)</label>
                         <textarea
                           rows={2}
                           value={siteSettings.subHeaderTagline}
@@ -3644,10 +6075,10 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 2. Top Notification Ticker Banner */}
-                  <div className="p-4 bg-white rounded-xl border border-stone-200 space-y-3">
+                  {/* 3. Top Notification Ticker Banner */}
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-3">
                     <h4 className="font-bold text-stone-800 text-xs border-b border-stone-200 pb-2 flex items-center justify-between">
-                      <span>2. शीर्ष सूचना पट्टी (Top Announcement Ticker)</span>
+                      <span>3. शीर्ष सूचना पट्टी (Top Announcement Ticker)</span>
                       <label className="flex items-center gap-2 cursor-pointer text-amber-800 font-bold">
                         <input
                           type="checkbox"
@@ -3660,7 +6091,7 @@ export default function App() {
                     </h4>
 
                     <div>
-                      <label className="block font-bold text-stone-800 mb-1">सूचना पट्टी संदेश (Ticker Message Text)</label>
+                      <label className="block font-bold text-stone-800 text-xs mb-1">सूचना पट्टी संदेश (Ticker Message Text)</label>
                       <input
                         type="text"
                         value={siteSettings.tickerMessage}
@@ -3670,15 +6101,35 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 3. Section Visibility Toggles */}
-                  <div className="p-4 bg-white rounded-xl border border-stone-200 space-y-3">
+                  {/* 4. Complete Section Visibility Toggles */}
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-3">
                     <h4 className="font-bold text-stone-800 text-xs border-b border-stone-200 pb-2">
-                      3. सेक्शन दृश्यता नियंत्रण (Section Visibility Toggles)
+                      4. सभी मुख्य सेक्शन दृश्यता नियंत्रण (Toggle Sections On/Off)
                     </h4>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
                       <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
-                        <span>आज का शब्द कार्ड</span>
+                        <span>🌟 त्वरित आँकड़े पट्टी (Quick Stats)</span>
+                        <input
+                          type="checkbox"
+                          checked={siteSettings.showQuickStats ?? true}
+                          onChange={(e) => setSiteSettings({...siteSettings, showQuickStats: e.target.checked})}
+                          className="w-4 h-4 text-amber-600 rounded"
+                        />
+                      </label>
+
+                      <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
+                        <span>🔤 देवनागरी वर्णमाला ग्रिड</span>
+                        <input
+                          type="checkbox"
+                          checked={siteSettings.showAlphabetGrid ?? true}
+                          onChange={(e) => setSiteSettings({...siteSettings, showAlphabetGrid: e.target.checked})}
+                          className="w-4 h-4 text-amber-600 rounded"
+                        />
+                      </label>
+
+                      <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
+                        <span>💡 आज का शब्द (Word of Day)</span>
                         <input
                           type="checkbox"
                           checked={siteSettings.showWordOfDay}
@@ -3688,7 +6139,7 @@ export default function App() {
                       </label>
 
                       <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
-                        <span>समाचार व घोषणाएं सेक्शन</span>
+                        <span>📢 समाचार व घोषणाएं सेक्शन</span>
                         <input
                           type="checkbox"
                           checked={siteSettings.showNewsSection}
@@ -3698,7 +6149,7 @@ export default function App() {
                       </label>
 
                       <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
-                        <span>माँ ताप्ती संस्थान कार्ड</span>
+                        <span>🏛️ माँ ताप्ती संस्थान कार्ड</span>
                         <input
                           type="checkbox"
                           checked={siteSettings.showShodhSansthanCard}
@@ -3708,7 +6159,7 @@ export default function App() {
                       </label>
 
                       <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
-                        <span>पहेलियाँ टैब</span>
+                        <span>🧩 पहेलियाँ मुख्य टैब</span>
                         <input
                           type="checkbox"
                           checked={siteSettings.showPaheliyanTab}
@@ -3718,7 +6169,7 @@ export default function App() {
                       </label>
 
                       <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
-                        <span>ई-क्विज़ व प्रमाण-पत्र टैब</span>
+                        <span>🏆 ई-क्विज़ व प्रमाण-पत्र टैब</span>
                         <input
                           type="checkbox"
                           checked={siteSettings.showQuizTab}
@@ -3726,6 +6177,55 @@ export default function App() {
                           className="w-4 h-4 text-amber-600 rounded"
                         />
                       </label>
+
+                      <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
+                        <span>🤝 संस्थान सदस्यता कार्ड</span>
+                        <input
+                          type="checkbox"
+                          checked={siteSettings.showMembershipCard ?? true}
+                          onChange={(e) => setSiteSettings({...siteSettings, showMembershipCard: e.target.checked})}
+                          className="w-4 h-4 text-amber-600 rounded"
+                        />
+                      </label>
+
+                      <label className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between cursor-pointer font-bold text-stone-800">
+                        <span>✍️ नया शब्द सुझाएं बटन</span>
+                        <input
+                          type="checkbox"
+                          checked={siteSettings.showSuggestWordButton ?? true}
+                          onChange={(e) => setSiteSettings({...siteSettings, showSuggestWordButton: e.target.checked})}
+                          className="w-4 h-4 text-amber-600 rounded"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* 5. Footer Content & Copyright */}
+                  <div className="p-4 bg-white rounded-2xl border border-stone-200 space-y-3">
+                    <h4 className="font-bold text-stone-800 text-xs border-b border-stone-200 pb-2">
+                      5. फूटर विवरण व कॉपीराइट संदेश (Footer Details)
+                    </h4>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">फूटर विवरण (Footer Description Text)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.footerText || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, footerText: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-stone-800 text-xs mb-1">कॉपीराइट पंक्ति (Copyright Text)</label>
+                        <input
+                          type="text"
+                          value={siteSettings.footerCopyright || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, footerCopyright: e.target.value})}
+                          className="w-full p-2 bg-stone-50 border border-stone-300 rounded-lg text-xs font-semibold"
+                        />
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -3851,15 +6351,18 @@ export default function App() {
                         {allEntries
                           .filter(e => !dictSearchTerm || e.clean_word.includes(dictSearchTerm) || e.hi_meaning.includes(dictSearchTerm))
                           .slice(0, 30)
-                          .map(entry => (
-                            <tr key={entry.clean_word} className="hover:bg-amber-50/40 transition">
+                          .map((entry, idx) => (
+                            <tr key={`cms_dict_${entry.clean_word}_${idx}`} className="hover:bg-amber-50/40 transition">
                               <td className="p-2.5 font-bold text-amber-950 text-xs">{entry.clean_word}</td>
                               <td className="p-2.5 text-stone-800 text-xs">{entry.hi_meaning}</td>
                               <td className="p-2.5 text-stone-600 text-xs">{entry.pos}</td>
                               <td className="p-2.5 text-right">
                                 <div className="flex items-center justify-end gap-1.5">
                                   <button
-                                    onClick={() => setEditingDictEntry(entry)}
+                                    onClick={() => {
+                                      setEditingDictEntry(entry);
+                                      setOriginalDictCleanWord(entry.clean_word);
+                                    }}
                                     className="px-2.5 py-1 bg-amber-800 hover:bg-amber-700 text-white font-bold rounded text-[11px] cursor-pointer"
                                   >
                                     ✏️ संपादित करें

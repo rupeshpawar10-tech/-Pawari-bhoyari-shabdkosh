@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Newspaper, Calendar, User, Megaphone, ArrowRight, Sparkles, ChevronDown, ChevronUp, BellRing } from 'lucide-react';
+import { Newspaper, Calendar, User, Megaphone, ArrowRight, Sparkles, ChevronDown, ChevronUp, BellRing, Trash2, Edit3 } from 'lucide-react';
 import { NewsItem } from '../types';
 
 interface NewsSectionProps {
   newsItems: NewsItem[];
+  isAdminAuthenticated?: boolean;
+  onOpenNewsCMS?: () => void;
+  onDeleteNewsItem?: (id: string, title?: string) => void;
+  onEditNewsItem?: (item: NewsItem) => void;
 }
 
-export const NewsSection: React.FC<NewsSectionProps> = ({ newsItems }) => {
+export const NewsSection: React.FC<NewsSectionProps> = ({ newsItems, isAdminAuthenticated, onOpenNewsCMS, onDeleteNewsItem, onEditNewsItem }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (!newsItems || newsItems.length === 0) return null;
@@ -47,9 +51,20 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ newsItems }) => {
             </h2>
           </div>
         </div>
-        <p className="text-xs text-stone-600 max-w-md">
-          पँवारी (भोयरी) भाषा, लोक-संस्कृति, शोध पत्र एवं माँ ताप्ती शोध संस्थान मुलताई की नवीनतम गतिविधियों के मुख्य समाचार
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-stone-600 max-w-md hidden md:block">
+            पँवारी (भोयरी) भाषा, लोक-संस्कृति, शोध पत्र एवं माँ ताप्ती शोध संस्थान मुलताई की नवीनतम गतिविधियों के मुख्य समाचार
+          </p>
+          {onOpenNewsCMS && (
+            <button
+              onClick={onOpenNewsCMS}
+              className="px-3.5 py-1.5 bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-xl text-xs font-bold border border-amber-600 shadow cursor-pointer flex items-center gap-1.5 shrink-0"
+              title="समाचार एवं घोषणाएं जोड़ें / संपादित करें"
+            >
+              <span>⚙️ समाचार CMS (एडमिन)</span>
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -98,25 +113,54 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ newsItems }) => {
                 </p>
               </div>
 
-              {/* Action */}
-              {!isShort && (
-                <button
-                  onClick={() => toggleExpand(item.id)}
-                  className="mt-4 pt-3 border-t border-stone-100 text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 cursor-pointer"
-                >
-                  {isExpanded ? (
-                    <>
-                      <span>कम दिखाएं</span>
-                      <ChevronUp className="w-3.5 h-3.5" />
-                    </>
-                  ) : (
-                    <>
-                      <span>पूरा समाचार पढ़ें</span>
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              )}
+              {/* Action Bar */}
+              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs font-bold">
+                {!isShort ? (
+                  <button
+                    onClick={() => toggleExpand(item.id)}
+                    className="text-amber-800 hover:text-amber-950 flex items-center gap-1 cursor-pointer"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <span>कम दिखाएं</span>
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </>
+                    ) : (
+                      <>
+                        <span>पूरा समाचार पढ़ें</span>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
+                ) : <span />}
+
+                {isAdminAuthenticated && (
+                  <div className="flex items-center gap-2">
+                    {onEditNewsItem && (
+                      <button
+                        type="button"
+                        onClick={() => onEditNewsItem(item)}
+                        className="text-amber-800 hover:text-amber-950 p-1 flex items-center gap-1 text-[11px] font-bold cursor-pointer transition"
+                        title="समाचार संपादित करें"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>संपादित करें</span>
+                      </button>
+                    )}
+                    {onDeleteNewsItem && (
+                      <button
+                        type="button"
+                        onClick={() => onDeleteNewsItem(item.id, item.title)}
+                        className="text-rose-600 hover:text-rose-800 p-1 flex items-center gap-1 text-[11px] font-bold cursor-pointer transition"
+                        title="समाचार हटाएं"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>हटाएं</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
